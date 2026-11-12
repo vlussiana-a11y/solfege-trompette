@@ -68,19 +68,31 @@ header .sub{font-size:14px;color:var(--muted);font-weight:600}
 table{border-collapse:collapse;width:100%;font-size:14px}
 td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
 th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-.soon{border-style:dashed;color:var(--muted)}
+#vp{min-height:190px}
+#memo{position:absolute;inset:0;background:var(--paper);display:grid;place-items:center;text-align:center;padding:16px}
+#memo .big{font-size:34px;font-weight:900}
+#memo .sub{font-size:17px;color:var(--muted);font-weight:700;margin-top:6px}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin:4px 2px 10px}
+.keys span{min-width:52px;text-align:center;border-radius:11px;padding:6px 8px;font-weight:800;font-size:14px;background:#EFE6D6;color:var(--muted);border:2px solid transparent}
+.keys span.cur{border-color:var(--brass);color:var(--ink);background:var(--paper)}
+.keys span.ok{background:var(--ok-l);color:#115B32}
+.keys span.ko{background:var(--bad-l);color:#8E1F1F}
+.slots{display:flex;gap:7px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.slots i{width:22px;height:22px;border-radius:50%;border:2px dashed var(--line2)}
+.slots i.ok{border:0;background:var(--ok)}
 </style>
 </head>
 <body>
 <div class="app">
   <header>
     <h1>🎺 Atelier Trompette</h1>
-    <span class="sub">Déchiffrage défilant</span>
   </header>
 
   <div id="loadErr" class="warn hidden">La bibliothèque de gravure musicale n'a pas pu se charger. Vérifie la connexion internet, puis recharge la page.</div>
 
-  <div class="card">
+  <div class="tabs" id="tabs"><button data-t="sight">Déchiffrage défilant</button><button data-t="jazz">Jazz</button></div>
+
+  <div id="pSight" class="card">
     <div class="grid">
       <div class="fld"><label for="fStyle">Style</label><select id="fStyle">
         <option value="c">Classique</option><option value="m">Marche / harmonie</option><option value="s">Swing</option><option value="l">Latin</option><option value="f">Funk</option></select></div>
@@ -93,29 +105,46 @@ th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu
       <div class="fld"><label for="fTempo">Tempo <span id="tempoUnit"></span></label><div class="tempo"><input type="range" id="fTempo" min="40" max="200" step="2"><b id="tempoVal"></b></div></div>
       <div class="fld"><label for="fLook">Regard</label><select id="fLook">
         <option value="0">Tout visible</option><option value="1">Masquer les notes passées</option><option value="2">Masquer jusqu'à 1 temps devant</option></select></div>
-      <div class="fld"><label for="fMic">Vérification</label><select id="fMic">
-        <option value="1">Avec micro</option><option value="0">Sans micro (auto-évaluation)</option></select></div>
-      <label class="chk"><input type="checkbox" id="fMetro"><span>Métronome</span></label>
     </div>
-    <details style="margin-top:12px">
-      <summary class="small muted" style="cursor:pointer;font-weight:700">Instrument, tessiture, taille de la partition</summary>
-      <div class="grid" style="margin-top:10px">
-        <div class="fld"><label for="fInstr">Instrument</label><select id="fInstr"><option value="bb">Trompette en Si♭</option><option value="c">Instrument en Ut</option></select></div>
-        <div class="fld"><label for="fLo">Note la plus grave</label><select id="fLo"></select></div>
-        <div class="fld"><label for="fHi">Note la plus aiguë</label><select id="fHi"></select></div>
-        <div class="fld"><label for="fSize">Taille</label><select id="fSize"><option value="1.25">Petite</option><option value="1.6">Moyenne</option><option value="2">Grande</option><option value="2.4">Très grande</option></select></div>
+  </div>
+
+  <div id="pJazz" class="hidden">
+    <div class="card">
+      <div class="grid">
+        <div class="fld"><label for="jType">Exercice</label><select id="jType">
+          <option value="lick">Traits écrits</option><option value="scale">Gammes et modes</option><option value="arp">Arpèges</option><option value="ear">Écoute et joue</option></select></div>
+        <div class="fld"><label for="jLevel">Niveau</label><select id="jLevel">
+          <option value="1">1 · Débutant</option><option value="2">2 · Élémentaire</option><option value="3">3 · Intermédiaire</option><option value="4">4 · Avancé</option><option value="5">5 · Expert</option></select></div>
+        <div class="fld" id="jItemF" style="grid-column:span 2"><label for="jItem">Choix</label><select id="jItem"></select></div>
+        <div class="fld"><label for="jOrder">Tonalités</label><select id="jOrder">
+          <option value="4ths">Cycle des quartes</option><option value="chrom">Chromatique montant</option><option value="rand">Ordre aléatoire</option><option value="single">Une seule tonalité</option></select></div>
+        <div class="fld"><label for="jKey">Tonalité de départ</label><select id="jKey"></select></div>
+        <div class="fld"><label for="jTempo">Tempo (noire)</label><div class="tempo"><input type="range" id="jTempo" min="50" max="240" step="2"><b id="jTempoVal"></b></div></div>
+        <div class="fld" id="jShowF"><label for="jShow">Partition</label><select id="jShow">
+          <option value="0">Toujours visible</option><option value="1">Visible à la 1re tonalité seulement</option><option value="2">Cachée (écouter, puis jouer)</option></select></div>
+        <div class="fld hidden" id="jHelpF"><label for="jHelp">Aide</label><select id="jHelp">
+          <option value="1">Gamme + première note</option><option value="0">Gamme seulement</option></select></div>
+        <label class="chk"><input type="checkbox" id="jSwing"><span>Croches swing</span></label>
+        <label class="chk"><input type="checkbox" id="jAuto"><span>Enchaîner tout seul</span></label>
       </div>
-    </details>
+    </div>
+    <div class="keys" id="jKeys"></div>
   </div>
 
   <div class="info" id="info"></div>
-  <div id="vp"><div id="strip"></div><div id="mask" class="hidden"></div><div id="ph" class="hidden"></div><div id="count" class="hidden"></div></div>
+  <div id="vp"><div id="strip"></div><div id="mask" class="hidden"></div><div id="ph" class="hidden"></div><div id="memo" class="hidden"></div><div id="count" class="hidden"></div></div>
 
-  <div class="transport">
+  <div class="transport" id="tSight">
     <button class="btn primary" id="bStart">▶︎ Départ</button>
     <button class="btn ghost" id="bNew">Nouveau morceau</button>
     <button class="btn ghost" id="bHear">🔊 Écouter</button>
     <div class="status" id="status"></div>
+  </div>
+  <div class="transport hidden" id="tJazz">
+    <button class="btn primary" id="jStart">▶︎ Départ</button>
+    <button class="btn ghost" id="jHear">🔊 Écouter</button>
+    <button class="btn ghost" id="jNext">Tonalité suivante →</button>
+    <div class="status" id="status2"></div>
   </div>
   <div id="micNote" class="warn hidden"></div>
 
@@ -125,7 +154,18 @@ th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu
     <h3>Journal de travail</h3>
     <div id="journal" class="small muted">Aucune séance pour l'instant.</div>
   </div>
-  <div class="card soon"><b>Module Jazz</b> — à venir : traits écrits à travailler dans toutes les tonalités, gammes, et exercices « écoute et joue ».</div>
+  <div class="card">
+    <h3>Réglages communs</h3>
+    <div class="grid">
+      <div class="fld"><label for="fMic">Vérification</label><select id="fMic">
+        <option value="1">Avec micro</option><option value="0">Sans micro (auto-évaluation)</option></select></div>
+      <div class="fld"><label for="fInstr">Instrument</label><select id="fInstr"><option value="bb">Trompette en Si♭</option><option value="c">Instrument en Ut</option></select></div>
+      <div class="fld"><label for="fLo">Note la plus grave</label><select id="fLo"></select></div>
+      <div class="fld"><label for="fHi">Note la plus aiguë</label><select id="fHi"></select></div>
+      <div class="fld"><label for="fSize">Taille de la partition</label><select id="fSize"><option value="1.25">Petite</option><option value="1.6">Moyenne</option><option value="2">Grande</option><option value="2.4">Très grande</option></select></div>
+      <label class="chk"><input type="checkbox" id="fMetro"><span>Métronome</span></label>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -133,9 +173,9 @@ th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu
 const $ = id => document.getElementById(id);
 /* ---------- stockage ---------- */
 const KEY = 'atelierTrompette.v1';
-const DEF = { style: 'c', level: 3, meter: 'auto', keyN: 'auto', bars: 16, tempo: {}, look: 0, mic: 1, metro: true, instr: 'bb', lo: 54, hi: 84, size: 1.6, journal: [] };
+const DEF = { style: 'c', level: 3, meter: 'auto', keyN: 'auto', bars: 16, tempo: {}, look: 0, mic: 1, metro: true, instr: 'bb', lo: 54, hi: 84, size: 1.6, journal: [], tab: 'sight', jz: { type: 'lick', level: 1, item: {}, order: '4ths', key: 0, tempo: {}, show: 0, help: 1, swing: true, auto: true, mast: {}, ear: {} } };
 let S = Object.assign({}, DEF);
-try { const r = localStorage.getItem(KEY); if (r) S = Object.assign({}, DEF, JSON.parse(r)); } catch (e) {}
+try { const r = localStorage.getItem(KEY); if (r) { const o = JSON.parse(r); S = Object.assign({}, DEF, o); S.jz = Object.assign({}, DEF.jz, o.jz || {}); } } catch (e) {}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 function transp() { return S.instr === 'bb' ? 2 : 0; }
 
@@ -382,7 +422,8 @@ function genPiece(o) {
 const DUR = { 48: 'w', 36: 'hd', 24: 'h', 18: 'qd', 12: 'q', 9: '8d', 6: '8', 3: '16', 4: '8', 8: 'q' };
 let PIECE = null, VIEW = null;
 function VFlib() { return (window.Vex && (window.Vex.Flow || window.Vex)) || window.VexFlow || null; }
-function render(piece) {
+function render(piece, o) {
+  o = o || {};
   const VF = VFlib(); if (!VF) { $('loadErr').classList.remove('hidden'); return false; }
   const host = $('strip'); host.innerHTML = '';
   const wOf = e => e.ticks >= 24 ? 48 : e.ticks >= 12 ? 42 : e.ticks >= 6 ? 36 : 31;
@@ -401,6 +442,7 @@ function render(piece) {
       const key = e.rest ? 'b/4' : LET[lt(e.dn)] + (e.acc === 1 ? '#' : e.acc === -1 ? 'b' : '') + '/' + Math.floor(e.dn / 7);
       const sn = new VF.StaveNote({ keys: [key], duration: d + (e.rest ? 'r' : ''), auto_stem: true });
       if (d.includes('d')) VF.Dot.buildAndAttach([sn], { all: true });
+      if (e.chT) sn.addModifier(new VF.Annotation(e.chT).setVerticalJustification(VF.Annotation.VerticalJustify.TOP).setFont('Arial', 13, 'bold'), 0);
       e.sn = sn; return sn;
     });
     const tuplets = []; let grp = null, gt = null;
@@ -421,8 +463,9 @@ function render(piece) {
   ties.forEach(([a, b]) => new VF.StaveTie({ first_note: a, last_note: b, first_indices: [0], last_indices: [0] }).setContext(c).draw());
   const svg = host.querySelector('svg');
   svg.setAttribute('viewBox', `0 0 ${total} ${H}`);
-  svg.style.width = total * S.size + 'px'; svg.style.height = H * S.size + 'px';
-  VIEW = { total, H };
+  const sc = o.fit ? Math.min(+S.size, ($('vp').clientWidth - 24) / total) : +S.size;
+  svg.style.width = total * sc + 'px'; svg.style.height = H * sc + 'px';
+  VIEW = { total, H, sc };
   return true;
 }
 function color(e, col) { if (!e.el) return; e.el.querySelectorAll('*').forEach(n => { if (n.getAttribute('fill') !== 'none') n.setAttribute('fill', col); if (n.getAttribute('stroke') && n.getAttribute('stroke') !== 'none') n.setAttribute('stroke', col); }); }
@@ -493,65 +536,83 @@ function newPiece() {
 function idleView() {
   const vp = $('vp'); vp.classList.remove('review'); vp.scrollLeft = 0;
   $('strip').style.transform = 'translate3d(0,0,0)';
-  $('ph').classList.add('hidden'); $('mask').classList.add('hidden'); $('count').classList.add('hidden');
+  $('ph').classList.add('hidden'); $('mask').classList.add('hidden'); $('count').classList.add('hidden'); $('memo').classList.add('hidden');
 }
-function setStatus(h) { $('status').innerHTML = h; }
+function setStatus(h) { $('status').innerHTML = h; $('status2').innerHTML = h; }
 ['fStyle', 'fLevel', 'fMeter', 'fKey', 'fBars'].forEach(id => $(id).onchange = newPiece);
 $('fTempo').oninput = e => { S.tempo[tempoKey()] = +e.target.value; $('tempoVal').textContent = e.target.value; save(); };
 $('fLook').onchange = e => { S.look = +e.target.value; save(); };
 $('fMic').onchange = e => { S.mic = +e.target.value; save(); };
 $('fMetro').onchange = e => { S.metro = e.target.checked; save(); };
 $('fInstr').onchange = e => { S.instr = e.target.value; save(); };
-$('fLo').onchange = e => { S.lo = +e.target.value; save(); newPiece(); };
-$('fHi').onchange = e => { S.hi = +e.target.value; save(); newPiece(); };
-$('fSize').onchange = e => { S.size = +e.target.value; save(); if (PIECE) { stopRun(); render(PIECE); idleView(); } };
+$('fLo').onchange = e => { S.lo = +e.target.value; save(); if (S.tab === 'jazz') jzSetup(); else newPiece(); };
+$('fHi').onchange = e => { S.hi = +e.target.value; save(); if (S.tab === 'jazz') jzSetup(); else newPiece(); };
+$('fSize').onchange = e => { S.size = +e.target.value; save(); if (S.tab === 'jazz') jzSetup(); else if (PIECE) { stopRun(); render(PIECE); idleView(); } };
 $('bNew').onclick = newPiece;
 
 /* ---------- lecture ---------- */
-const RUN = { on: false, raf: 0, kind: null, bus: null, lock: null };
+const RUN = { on: false, raf: 0, o: {} };
+let KEEP_MIC = false;
+function syncButtons() {
+  const sight = RUN.on && !RUN.o.jazz, hear = sight && RUN.kind === 'hear';
+  $('bStart').textContent = sight && !hear ? '■ Stop' : '▶︎ Départ'; $('bStart').classList.toggle('stop', sight && !hear); $('bStart').disabled = hear;
+  $('bHear').textContent = hear ? '■ Stop' : '🔊 Écouter'; $('bHear').disabled = sight && !hear; $('bNew').disabled = sight;
+  jzSync();
+}
 $('bStart').onclick = () => { if (RUN.on) { stopRun(); idleView(); setStatus('Arrêté.'); } else startRun('play'); };
 $('bHear').onclick = () => { if (RUN.on) { stopRun(); idleView(); setStatus('Arrêté.'); } else startRun('hear'); };
-async function startRun(kind) {
-  if (!PIECE || RUN.on) return;
+async function startRun(kind, o) {
+  o = o || {};
+  const piece = o.piece || PIECE; if (!piece || RUN.on) return;
   const c = ctx();
-  const useMic = kind === 'play' && CAN_MIC && +S.mic === 1;
-  if (useMic) { try { await openMic(); } catch (e) { $('micNote').classList.remove('hidden'); $('micNote').textContent = "Micro refusé : lecture sans vérification. Autorise le micro dans les réglages du navigateur pour l'activer."; } }
-  else setSession('playback');
+  const wantMic = kind === 'play' && CAN_MIC && +S.mic === 1;
+  if (wantMic) { try { await openMic(); } catch (e) { $('micNote').classList.remove('hidden'); $('micNote').textContent = "Micro refusé : lecture sans vérification. Autorise le micro dans les réglages du navigateur pour l'activer."; } }
+  else if (!mic) setSession('playback');
   if (c.state !== 'running') { try { await c.resume(); } catch (e) {} }
-  // remise à zéro des couleurs
-  PIECE.flat.forEach(e => { if (!e.rest) color(e, '#1E1912'); });
-  const bpm = curTempo(), tl = buildTimeline(PIECE, bpm);
+  if (RUN.on) return;
+  piece.flat.forEach(e => { if (!e.rest) color(e, '#1E1912'); });
+  const bpm = o.bpm || curTempo(), tl = buildTimeline(piece, bpm);
   const bus = c.createGain(); bus.connect(c.destination);
-  const nCount = PIECE.nb <= 2 ? PIECE.nb * 2 : PIECE.nb;
+  const nCount = piece.nb <= 2 ? piece.nb * 2 : piece.nb;
   const t0 = c.currentTime + 0.4, tS = t0 + nCount * tl.beatSec;
-  for (let i = 0; i < nCount; i++) click(bus, t0 + i * tl.beatSec, i % PIECE.nb === 0, 1);
-  const nBeats = PIECE.bars.length * PIECE.nb;
-  if (S.metro || kind === 'hear') for (let b = 0; b < nBeats; b++) click(bus, tS + b * tl.beatSec, b % PIECE.nb === 0, kind === 'hear' ? .3 : .5);
+  for (let i = 0; i < nCount; i++) click(bus, t0 + i * tl.beatSec, i % piece.nb === 0, 1);
+  const nBeats = piece.bars.length * piece.nb;
+  if (S.metro || kind === 'hear') for (let b = 0; b < nBeats; b++) click(bus, tS + b * tl.beatSec, b % piece.nb === 0, kind === 'hear' ? .3 : .5);
   if (kind === 'hear') tl.notes.forEach(n => tone(bus, tS + n.on, Math.max(.06, (n.end - n.on) * .92), n.midi - transp()));
   const off = audioPerfOffset();
-  Object.assign(RUN, { on: true, kind, bus, tl, useMic: useMic && !!mic, perfStart: tS * 1000 + off, nCount, ni: 0, prevW: null, audioStart: tS });
+  Object.assign(RUN, { on: true, kind, o, piece, bus, tl, bpm, useMic: wantMic && !!mic, perfStart: tS * 1000 + off, nCount, ni: 0, prevW: null, sc: VIEW.sc });
   const vp = $('vp'); vp.classList.remove('review'); vp.scrollLeft = 0;
-  $('ph').classList.remove('hidden'); $('result').classList.add('hidden');
-  $('mask').classList.toggle('hidden', kind !== 'play' || +S.look === 0);
-  $('bStart').textContent = '■ Stop'; $('bStart').classList.add('stop'); $('bHear').disabled = kind !== 'hear'; $('bNew').disabled = true;
-  if (kind === 'hear') { $('bHear').textContent = '■ Stop'; $('bStart').disabled = true; }
+  $('ph').classList.toggle('hidden', !!o.hide); $('memo').classList.toggle('hidden', !o.hide); $('result').classList.add('hidden');
+  $('mask').classList.toggle('hidden', !!o.static || kind !== 'play' || +S.look === 0);
+  syncButtons();
   try { if (navigator.wakeLock) RUN.lock = await navigator.wakeLock.request('screen'); } catch (e) {}
   RUN.raf = requestAnimationFrame(frame);
 }
+function staticPad() { return Math.max(8, ($('vp').clientWidth - VIEW.total * VIEW.sc) / 2); }
 function frame() {
   if (!RUN.on) return;
-  const tl = RUN.tl, t = (performance.now() - RUN.perfStart) / 1000;
-  const vp = $('vp'), phX = Math.round(vp.clientWidth * .22), sc = S.size;
-  const x = xAt(tl, t);
-  $('strip').style.transform = `translate3d(${(phX - x * sc).toFixed(1)}px,0,0)`;
-  $('ph').style.left = (phX - 1) + 'px';
-  if (RUN.kind === 'play' && +S.look > 0) $('mask').style.width = Math.max(0, phX - 14 + (+S.look === 2 ? (xAt(tl, t + tl.beatSec) - x) * sc : 0)) + 'px';
+  const tl = RUN.tl, piece = RUN.piece, t = (performance.now() - RUN.perfStart) / 1000;
+  const vp = $('vp'), sc = RUN.sc, x = xAt(tl, t);
+  if (RUN.o.static) {
+    const pad = staticPad();
+    $('strip').style.transform = `translate3d(${pad.toFixed(1)}px,0,0)`;
+    $('ph').style.left = (pad + Math.max(tl.A[0][1] - 26, x) * sc - 1).toFixed(1) + 'px';
+  } else {
+    const phX = Math.round(vp.clientWidth * .22);
+    $('strip').style.transform = `translate3d(${(phX - x * sc).toFixed(1)}px,0,0)`;
+    $('ph').style.left = (phX - 1) + 'px';
+    if (RUN.kind === 'play' && +S.look > 0) $('mask').style.width = Math.max(0, phX - 14 + (+S.look === 2 ? (xAt(tl, t + tl.beatSec) - x) * sc : 0)) + 'px';
+  }
   const cnt = $('count');
-  if (t < 0) { const k = RUN.nCount + Math.floor(t / tl.beatSec); cnt.classList.remove('hidden'); cnt.textContent = k >= 0 ? (k % PIECE.nb) + 1 : ''; }
-  else { cnt.classList.add('hidden'); const bar = Math.min(PIECE.bars.length, Math.floor(t / (tl.beatSec * PIECE.nb)) + 1); setStatus(`Mesure <b>${bar}</b> / ${PIECE.bars.length}` + (RUN.useMic ? `<span class="meter"><i id="lvl"></i></span>` : '')); }
+  if (t < 0) { const k = RUN.nCount + Math.floor(t / tl.beatSec); cnt.classList.remove('hidden'); cnt.textContent = k >= 0 ? (k % piece.nb) + 1 : ''; }
+  else {
+    cnt.classList.add('hidden');
+    const bar = Math.min(piece.bars.length, Math.floor(t / (tl.beatSec * piece.nb)) + 1);
+    setStatus((RUN.o.label ? RUN.o.label : `Mesure <b>${bar}</b> / ${piece.bars.length}`) + (RUN.useMic ? `<span class="meter"><i class="lvl"></i></span>` : ''));
+  }
   if (RUN.useMic && mic) {
     const r = yin(readMic(), actx.sampleRate);
-    const lv = $('lvl'); if (lv) lv.style.transform = `scaleX(${Math.min(1, r.rms * 8).toFixed(2)})`;
+    document.querySelectorAll('.lvl').forEach(lv => lv.style.transform = `scaleX(${Math.min(1, r.rms * 8).toFixed(2)})`);
     const w = r.f && r.rms > 0.012 ? Math.round(69 + 12 * Math.log2(r.f / 440)) + transp() : null;
     const stable = w != null && w === RUN.prevW; RUN.prevW = w;
     for (let i = RUN.ni; i < tl.notes.length; i++) {
@@ -561,7 +622,7 @@ function frame() {
       if (t > we) { if (!n.hit && !n.judged) n.evs.forEach(e => color(e, '#C93838')); n.judged = true; if (i === RUN.ni) RUN.ni++; }
     }
   }
-  if (t > tl.dur + .7) { finish(); return; }
+  if (t > tl.dur + (RUN.o.static ? .35 : .7)) { finish(); return; }
   RUN.raf = requestAnimationFrame(frame);
 }
 function stopRun() {
@@ -569,24 +630,25 @@ function stopRun() {
   RUN.on = false; cancelAnimationFrame(RUN.raf);
   try { RUN.bus.disconnect(); } catch (e) {}
   try { RUN.lock && RUN.lock.release(); } catch (e) {} RUN.lock = null;
-  closeMic();
-  $('bStart').textContent = '▶︎ Départ'; $('bStart').classList.remove('stop'); $('bStart').disabled = false;
-  $('bHear').textContent = '🔊 Écouter'; $('bHear').disabled = false; $('bNew').disabled = false;
+  if (!KEEP_MIC) closeMic();
   $('count').classList.add('hidden');
+  syncButtons();
 }
 function reviewView() {
   const vp = $('vp'); $('ph').classList.add('hidden'); $('mask').classList.add('hidden');
   $('strip').style.transform = 'none'; vp.classList.add('review'); vp.scrollLeft = 0;
 }
 function finish() {
-  const { kind, tl, useMic } = RUN; const bpm = curTempo();
-  stopRun(); reviewView();
+  const { kind, tl, useMic, o, bpm } = RUN;
+  const n = tl.notes.length, ok = tl.notes.filter(x => x.hit).length, pct = Math.round(100 * ok / n);
+  stopRun();
+  if (o.onDone) { o.onDone({ kind, useMic, pct, ok, n }); return; }
+  reviewView();
   if (kind === 'hear') { setStatus('Écoute terminée.'); return; }
   const box = $('result'); box.classList.remove('hidden');
   const entry = { d: Date.now(), st: PIECE.style, L: PIECE.level, bpm, m: PIECE.meter, k: PIECE.label };
   const again = `<div class="transport"><button class="btn ghost sm" id="rAgain">↻ Relire le même</button><button class="btn primary sm" id="rNew">Nouveau morceau</button><button class="btn ghost sm" id="rHear">🔊 Écouter la solution</button></div>`;
   if (useMic) {
-    const n = tl.notes.length, ok = tl.notes.filter(x => x.hit).length, pct = Math.round(100 * ok / n);
     entry.pct = pct;
     const adv = pct >= 92 ? "Très propre. Monte le tempo de 8 à 10, ou passe au niveau suivant." : pct >= 75 ? "Bonne lecture. Reprends un nouveau morceau au même tempo pour stabiliser." : pct >= 50 ? "Baisse le tempo d'une dizaine et garde le regard en avance sur le curseur." : "Trop rapide ou trop chargé pour l'instant : baisse le tempo ou le niveau.";
     box.innerHTML = `<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><div><div class="res-big">${pct} %</div><div class="small muted">${ok} notes reconnues sur ${n}</div></div><div style="flex:1;min-width:220px"><b>${adv}</b><div class="small muted" style="margin-top:4px">Les notes vertes ont été entendues à leur place, les rouges non. La vérification porte sur la hauteur, avec une tolérance sur le placement : elle reste indicative sur les traits rapides.</div></div></div>${again}`;
@@ -608,11 +670,383 @@ function renderJournal() {
     return `<tr><td>${d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td><td>${STYLE_NAME[e.st]}</td><td>${e.L}</td><td>${e.k}</td><td>${e.m}</td><td>${e.bpm}</td><td>${e.pct != null ? e.pct + ' %' : e.self ? '⭐'.repeat(e.self) : '—'}</td></tr>`;
   }).join('') + '</table>';
 }
-document.addEventListener('visibilitychange', () => { if (document.hidden && RUN.on) { stopRun(); idleView(); setStatus('Interrompu.'); } });
-window.addEventListener('keydown', e => { if (e.code === 'Space' && !/^(INPUT|SELECT|BUTTON)$/.test(e.target.tagName)) { e.preventDefault(); $('bStart').click(); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) return; if (S.tab === 'jazz') jzStop('Interrompu.'); else if (RUN.on) { stopRun(); idleView(); setStatus('Interrompu.'); } });
+window.addEventListener('keydown', e => { if (e.code === 'Space' && !/^(INPUT|SELECT|BUTTON)$/.test(e.target.tagName)) { e.preventDefault(); (S.tab === 'jazz' ? $('jStart') : $('bStart')).click(); } });
 
-fillControls(); renderJournal();
-if (VFlib()) newPiece(); else $('loadErr').classList.remove('hidden');
+/* =========================================================
+   MODULE JAZZ
+   ========================================================= */
+const KFR = ['Do', 'Ré♭', 'Ré', 'Mi♭', 'Mi', 'Fa', 'Fa♯', 'Sol', 'La♭', 'La', 'Si♭', 'Si'];
+const CH_STD = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'];
+const TONICS = [[[0, 0]], [[1, -1], [0, 1]], [[1, 0]], [[2, -1], [1, 1]], [[2, 0]], [[3, 0]], [[3, 1], [4, -1]], [[4, 0]], [[5, -1], [4, 1]], [[5, 0]], [[6, -1], [5, 1]], [[6, 0]]];
+const DT = { w: 48, hd: 36, h: 24, qd: 18, q: 12, ed: 9, e: 6, s: 3, t: 4 };
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+// Traits écrits en Do (vocabulaire générique), transposés ensuite dans les 12 tons
+const LICKS = [
+  ['l01', 1, 'Motif 1-2-3-5 (majeur)', '[C] C4/e D4/e E4/e G4/e E4/e D4/e C4/q'],
+  ['l02', 1, 'Motif 1-2-♭3-5 (mineur)', '[Cm7] C4/e D4/e Eb4/e G4/e Eb4/e D4/e C4/q'],
+  ['l03', 1, 'Arpège qui monte, gamme qui descend', '[Cmaj7] C4/e E4/e G4/e B4/e A4/e G4/e F4/e E4/e | D4/q C4/hd'],
+  ['l04', 1, 'Blues : la cellule de base', '[C7] C4/e Eb4/e F4/e F#4/e G4/q r/q'],
+  ['l05', 1, 'Tierces descendantes', '[Cmaj7] E5/e C5/e D5/e B4/e C5/e A4/e B4/e G4/e | C5/w'],
+  ['l06', 1, 'Pentatonique mineure', '[Cm7] G4/e Bb4/e C5/e Bb4/e G4/e F4/e Eb4/e F4/e | C4/w'],
+  ['l07', 2, 'II–V–I : les arpèges', '[Dm7] D4/e F4/e A4/e C5/e [G7] B4/e G4/e F4/e D4/e | [Cmaj7] E4/h r/h'],
+  ['l08', 2, 'II–V–I : gamme et sensible', '[Dm7] D4/e E4/e F4/e A4/e [G7] G4/e F4/e D4/e B3/e | [Cmaj7] C4/h r/h'],
+  ['l09', 2, 'Mixolydien, autour de la ♭7', '[C7] C5/e Bb4/e A4/e G4/e E4/e G4/e Bb4/e A4/e | G4/h r/h'],
+  ['l10', 2, 'Blues : question et réponse', '[C7] r/e G4/e Bb4/e C5/e Eb5/q C5/q | Bb4/e G4/e F4/e Eb4/e C4/h'],
+  ['l11', 2, 'Dorien : les cinq premières notes', '[Cm7] C4/e D4/e Eb4/e F4/e G4/q Eb4/q | C4/w'],
+  ['l12', 2, 'Triades diatoniques', '[Cmaj7] C4/e E4/e G4/e D4/e F4/e A4/e E4/e G4/e | B4/q G4/q C5/h'],
+  ['l13', 3, 'Gamme bebop dominante', '[G7] G5/e F#5/e F5/e E5/e D5/e C5/e B4/e A4/e | [Cmaj7] G4/h r/h'],
+  ['l14', 3, 'Approche encadrée (enclosure)', '[Cmaj7] r/e F4/e D4/e D#4/e E4/q G4/q | C5/h r/h'],
+  ['l15', 3, 'II–V–I : de la 3ce à la ♭9', '[Dm7] F4/e A4/e C5/e E5/e [G7b9] D5/e B4/e Ab4/e F4/e | [Cmaj7] E4/h r/h'],
+  ['l16', 3, 'II–V–I mineur', '[Dm7b5] D4/e F4/e Ab4/e C5/e [G7b9] B4/e Ab4/e G4/e F4/e | [Cm6] Eb4/h r/h'],
+  ['l17', 3, 'Chromatisme de passage', '[Cmaj7] G4/e Ab4/e A4/e Bb4/e B4/e C5/e D5/e B4/e | C5/h r/h'],
+  ['l18', 3, 'Blues majeur : la 6te et la blue note', '[C7] E4/e G4/e A4/e G4/e Eb4/e E4/e C4/q'],
+  ['l19', 3, 'Arpèges 3-5-7-9', '[Dm7] F4/e A4/e C5/e E5/e [G7] B4/e D5/e F5/e A5/e | [Cmaj7] G5/h r/h'],
+  ['l20', 3, "Triolets d'arpège", '[Cmaj7] C4/t E4/t G4/t B4/t G4/t E4/t D4/t F4/t A4/t C5/q'],
+  ['l21', 4, 'II–V–I : ligne bebop', '[Dm7] A4/e C5/e E5/e D5/e [G7b9] B4/e D5/e F5/e Ab5/e | [Cmaj7] G5/q E5/q r/h'],
+  ['l22', 4, 'Gamme altérée sur le V', '[G7alt] Ab4/e Bb4/e B4/e Db5/e Eb5/e Db5/e B4/e Bb4/e | [Cmaj7] G4/h r/h'],
+  ['l23', 4, 'Turnaround I–VI–II–V', '[Cmaj7] E4/e G4/e B4/e G4/e [A7] C#5/e A4/e G4/e E4/e | [Dm7] F4/e A4/e C5/e A4/e [G7] B4/e G4/e F4/e D4/e | [Cmaj7] E4/w'],
+  ['l24', 4, 'Substitution tritonique', '[Dm7] D4/e F4/e A4/e C5/e [Db7] B4/e Ab4/e F4/e Db4/e | [Cmaj7] C4/h r/h'],
+  ['l25', 4, 'Gamme diminuée demi-ton / ton', '[G7b9] G4/e Ab4/e Bb4/e B4/e Db5/e D5/e E5/e F5/e | [Cmaj7] E5/h r/h'],
+  ['l26', 4, 'Gamme bebop majeure', '[Cmaj7] C5/e B4/e A4/e Ab4/e G4/e F4/e E4/e D4/e | C4/h r/h'],
+  ['l27', 4, "Approches chromatiques des notes de l'accord", '[Cmaj7] r/e Eb4/e E4/e F#4/e G4/e Bb4/e B4/e D5/e | C5/h r/h'],
+  ['l28', 5, 'Motif 1-2-3-5 sur cycle de tierces', '[Cmaj7] C4/e D4/e E4/e G4/e [Eb7] Eb4/e F4/e G4/e Bb4/e | [Abmaj7] Ab4/e Bb4/e C5/e Eb5/e [B7] B4/e C#5/e D#5/e F#5/e | [Emaj7] E5/w'],
+  ['l29', 5, 'Lydien ♭7', '[C7#11] C4/e E4/e F#4/e G4/e Bb4/e A4/e F#4/e E4/e | D4/h r/h'],
+  ['l30', 5, 'II–V–I mineur : locrien ♮2 puis altérée', '[Dm7b5] D4/e E4/e F4/e G4/e Ab4/e Bb4/e C5/e D5/e | [G7alt] Eb5/e Db5/e B4/e Bb4/e Ab4/e G4/e F4/e Eb4/e | [Cm6] C4/w'],
+  ['l31', 5, 'Quartes (couleur modale)', '[Dm7] D4/e G4/e C5/e A4/e D5/e G5/e F5/e C5/e | A4/h r/h']
+];
+const SCALES = [
+  ['maj', 1, 'Majeure (ionien)', 'C D E F G A B', 'Cmaj7'], ['pmaj', 1, 'Pentatonique majeure', 'C D E G A', 'C6'],
+  ['pmin', 1, 'Pentatonique mineure', 'C Eb F G Bb', 'Cm7'], ['blues', 1, 'Blues', 'C Eb F F# G Bb', 'C7'],
+  ['dor', 2, 'Dorien', 'C D Eb F G A Bb', 'Cm7'], ['mixo', 2, 'Mixolydien', 'C D E F G A Bb', 'C7'], ['eol', 2, 'Mineur naturel (éolien)', 'C D Eb F G Ab Bb', 'Cm7'],
+  ['lyd', 3, 'Lydien', 'C D E F# G A B', 'Cmaj7#11'], ['bdom', 3, 'Bebop dominante', 'C D E F G A Bb B', 'C7'], ['bmaj', 3, 'Bebop majeure', 'C D E F G G# A B', 'Cmaj7'],
+  ['mmel', 3, 'Mineur mélodique', 'C D Eb F G A B', 'CmMaj7'], ['mharm', 3, 'Mineur harmonique', 'C D Eb F G Ab B', 'CmMaj7'],
+  ['phr', 4, 'Phrygien', 'C Db Eb F G Ab Bb', 'Cm7'], ['loc', 4, 'Locrien', 'C Db Eb F Gb Ab Bb', 'Cm7b5'], ['lydb7', 4, 'Lydien ♭7', 'C D E F# G A Bb', 'C7#11'],
+  ['alt', 5, 'Altérée', 'C Db D# E Gb Ab Bb', 'C7alt'], ['dimhw', 5, 'Diminuée demi-ton / ton', 'C Db Eb E F# G A Bb', 'C7b9'],
+  ['dimwh', 5, 'Diminuée ton / demi-ton', 'C D Eb F F# G# A B', 'Cdim7'], ['wt', 5, 'Par tons', 'C D E F# G# Bb', 'C7#5']
+];
+const ARPS = [
+  ['maj7', 1, 'Maj7', 'C E G B', 'Cmaj7'], ['dom7', 1, '7 (dominante)', 'C E G Bb', 'C7'], ['m7', 1, 'm7', 'C Eb G Bb', 'Cm7'],
+  ['m7b5', 2, 'm7♭5 (demi-diminué)', 'C Eb Gb Bb', 'Cm7b5'], ['six', 2, '6', 'C E G A', 'C6'],
+  ['dim7', 3, 'dim7', 'C Eb Gb A', 'Cdim7'], ['mmaj7', 3, 'm(maj7)', 'C Eb G B', 'CmMaj7'],
+  ['maj9', 4, 'Maj9', 'C E G B D', 'Cmaj9', 1], ['dom9', 4, '9', 'C E G Bb D', 'C9', 1], ['m9', 4, 'm9', 'C Eb G Bb D', 'Cm9', 1],
+  ['d7b9', 5, '7♭9', 'C E G Bb Db', 'C7b9', 1], ['aug7', 5, '7♯5', 'C E G# Bb', 'C7#5']
+];
+const JZ_ITEMS = {
+  lick: LICKS.map(l => ({ id: l[0], L: l[1], name: l[2], src: l[3] })),
+  scale: SCALES.map(l => ({ id: l[0], L: l[1], name: l[2], str: l[3], ch: l[4], oct: true })),
+  arp: ARPS.map(l => ({ id: l[0], L: l[1], name: 'Arpège ' + l[2], str: l[3], ch: l[4], oct: !l[5] }))
+};
+
+function parsePitch(tok) { const m = /^([A-G])([#b]?)(\d)$/.exec(tok); return { dn: +m[3] * 7 + 'CDEFGAB'.indexOf(m[1]), acc: m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0 }; }
+function parseLick(str) {
+  const bars = []; let ch = null, tg = null, tc = 0;
+  str.split('|').forEach(bs => {
+    const bar = [];
+    bs.trim().split(/\s+/).forEach(tok => {
+      if (!tok) return;
+      if (tok[0] === '[') { ch = tok.slice(1, -1); return; }
+      const [p, d] = tok.split('/'); const e = { ticks: DT[d], rest: p === 'r', tup: null };
+      if (!e.rest) Object.assign(e, parsePitch(p));
+      if (d === 't') { if (tc % 3 === 0) tg = {}; e.tup = tg; tc++; }
+      if (ch) { e.ch = ch; ch = null; }
+      bar.push(e);
+    });
+    bars.push(bar);
+  });
+  return bars;
+}
+function scaleNotes(str) { let prev = -1, oct = 4; return str.split(' ').map(t => { let n = parsePitch(t + oct); while (midiOf(n.dn, n.acc) <= prev) { oct++; n = parsePitch(t + oct); } prev = midiOf(n.dn, n.acc); return n; }); }
+function upDown(ns, addOct) { const up = ns.slice(); if (addOct) up.push({ dn: ns[0].dn + 7, acc: ns[0].acc }); return up.concat(up.slice(0, -1).reverse()); }
+function packEighths(seq, ch) {
+  const bars = []; let bar = [];
+  seq.forEach((n, i) => {
+    const used = bar.reduce((a, e) => a + e.ticks, 0), e = { rest: false, tup: null, dn: n.dn, acc: n.acc };
+    if (i === 0 && ch) e.ch = ch;
+    if (i < seq.length - 1) { e.ticks = 6; bar.push(e); if (used + 6 === 48) { bars.push(bar); bar = []; } return; }
+    const r = 48 - used;
+    if (r === 6) { e.ticks = 6; e.tie = true; bar.push(e); bars.push(bar); bars.push([{ ticks: 24, rest: false, tup: null, dn: n.dn, acc: n.acc }, { ticks: 24, rest: true, tup: null }]); bar = null; return; }
+    if (r === 42 || r === 30) { e.ticks = r - 6; bar.push(e); bar.push({ ticks: 6, rest: true, tup: null }); }
+    else { e.ticks = r; bar.push(e); }
+    bars.push(bar); bar = null;
+  });
+  return bars;
+}
+function mkPiece(bars, swing) {
+  const flat = []; let T = 0;
+  bars.forEach((b, bi) => b.forEach(e => { e.bar = bi; e.T = T; T += e.ticks; flat.push(e); }));
+  flat.forEach((e, i) => { if (e.tie && flat[i + 1]) flat[i + 1].tiedFrom = true; });
+  return { bars, flat, meter: '4/4', compound: false, nb: 4, beatT: 12, barT: 48, n: 0, keyName: 'C', swing, total: T };
+}
+function trChord(ch, pc, sharp) {
+  const m = /^([A-G])([#b]?)(.*)$/.exec(ch), p0 = PCS['CDEFGAB'.indexOf(m[1])] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0);
+  return CH_STD[(p0 + pc + 120) % 12] + m[3].replace(/b/g, '♭').replace(/#/g, '♯');
+}
+function transposeBars(bars0, pc) {
+  const tm = new Map();
+  const bars = bars0.map(b => b.map(e => { const c = { ticks: e.ticks, rest: e.rest, tup: null, dn: e.dn, acc: e.acc, ch: e.ch, tie: e.tie }; if (e.tup) { if (!tm.has(e.tup)) tm.set(e.tup, {}); c.tup = tm.get(e.tup); } return c; }));
+  const all = [].concat(...bars), ev = all.filter(e => !e.rest);
+  let best = null;
+  for (const [dl, da] of TONICS[pc]) {
+    const out = ev.map(n => { const dn = n.dn + dl; return { dn, acc: midiOf(n.dn, n.acc) + pc - midiOf(dn, 0) }; });
+    const cost = out.reduce((a, o) => a + Math.abs(o.acc) + (Math.abs(o.acc) > 1 ? 10 : 0), 0);
+    if (!best || cost < best.cost) best = { out, cost, dl, da };
+  }
+  best.out.forEach(o => { if (Math.abs(o.acc) > 1) { const m = midiOf(o.dn, o.acc); o.dn += o.acc > 0 ? 1 : -1; o.acc = m - midiOf(o.dn, 0); } });
+  const ms = best.out.map(o => midiOf(o.dn, o.acc)), lo = Math.max(54, +S.lo), hi = +S.hi;
+  let bk = 0, bc = 1e9;
+  for (const k of [-2, -1, 0, 1]) { const mn = Math.min(...ms) + 12 * k, mx = Math.max(...ms) + 12 * k; const c = (Math.max(0, lo - mn) + Math.max(0, mx - hi)) * 100 + Math.abs((mn + mx) / 2 - 69); if (c < bc) { bc = c; bk = k; } }
+  ev.forEach((e, i) => { e.dn = best.out[i].dn + 7 * bk; e.acc = best.out[i].acc; });
+  all.forEach(e => { if (e.ch) e.chT = trChord(e.ch, pc, best.da > 0); });
+  return { bars, tonic: FR[best.dl] + (best.da > 0 ? '♯' : best.da < 0 ? '♭' : '') };
+}
+function itemBars(type, it) { return type === 'lick' ? parseLick(it.src) : packEighths(upDown(scaleNotes(it.str), it.oct), it.ch); }
+
+/* ---------- session ---------- */
+const JZ = { keys: [0], idx: 0, piece: null, to: 0, fails: 0, chain: false, pending: false };
+function jzLater(fn, ms) { JZ.pending = true; jzSync(); JZ.to = setTimeout(() => { JZ.pending = false; fn(); }, ms); }
+const JE = { phase: 'idle', raf: 0 };
+const isEar = () => S.jz.type === 'ear';
+function jzItems() { return JZ_ITEMS[S.jz.type].filter(i => i.L <= S.jz.level); }
+function jzCur() { const l = jzItems(); return l.find(i => i.id === S.jz.item[S.jz.type]) || l.find(i => i.L === S.jz.level) || l[l.length - 1]; }
+function jzTempoKey() { return S.jz.type + S.jz.level; }
+function jzTempo() { return S.jz.tempo[jzTempoKey()] || (isEar() ? [80, 90, 100, 112, 126] : [72, 84, 96, 112, 132])[S.jz.level - 1]; }
+function jzFillItems() {
+  if (isEar()) return;
+  const cur = jzCur();
+  $('jItem').innerHTML = jzItems().map(i => `<option value="${i.id}">${i.name} · niv. ${i.L}</option>`).join('');
+  $('jItem').value = cur.id;
+}
+function jzFillControls() {
+  $('jKey').innerHTML = KFR.map((k, i) => `<option value="${i}">${k}</option>`).join('');
+  const j = S.jz;
+  $('jType').value = j.type; $('jLevel').value = j.level; $('jOrder').value = j.order; $('jKey').value = j.key; $('jShow').value = j.show; $('jHelp').value = j.help; $('jSwing').checked = j.swing; $('jAuto').checked = j.auto;
+  $('jType').onchange = e => { j.type = e.target.value; save(); jzSetup(); };
+  $('jLevel').onchange = e => { j.level = +e.target.value; save(); jzSetup(); };
+  $('jItem').onchange = e => { j.item[j.type] = e.target.value; save(); jzSetup(); };
+  $('jOrder').onchange = e => { j.order = e.target.value; save(); jzSetup(); };
+  $('jKey').onchange = e => { j.key = +e.target.value; save(); jzSetup(); };
+  $('jShow').onchange = e => { j.show = +e.target.value; save(); jzSetup(); };
+  $('jHelp').onchange = e => { j.help = +e.target.value; save(); jzSetup(); };
+  $('jSwing').onchange = e => { j.swing = e.target.checked; save(); jzSetup(); };
+  $('jAuto').onchange = e => { j.auto = e.target.checked; save(); };
+  $('jTempo').oninput = e => { j.tempo[jzTempoKey()] = +e.target.value; $('jTempoVal').textContent = e.target.value; save(); };
+  $('tabs').querySelectorAll('button').forEach(b => b.onclick = () => showTab(b.dataset.t));
+}
+function showTab(t) {
+  jzStop(); if (RUN.on) stopRun();
+  S.tab = t; save();
+  const jz = t === 'jazz';
+  $('tabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  $('pSight').classList.toggle('hidden', jz); $('tSight').classList.toggle('hidden', jz);
+  $('pJazz').classList.toggle('hidden', !jz); $('tJazz').classList.toggle('hidden', !jz);
+  $('journalCard').classList.toggle('hidden', jz); $('result').classList.add('hidden');
+  if (jz) jzSetup(); else newPiece();
+}
+function jzOrder() {
+  const o = S.jz.order, st = +S.jz.key;
+  if (o === 'single') return [st];
+  if (o === 'rand') return shuffle([...Array(12).keys()]);
+  return Array.from({ length: 12 }, (_, i) => (st + (o === '4ths' ? 5 : 1) * i) % 12);
+}
+function jzSetup() {
+  jzStop();
+  const ear = isEar();
+  $('jItemF').classList.toggle('hidden', ear); $('jShowF').classList.toggle('hidden', ear); $('jHelpF').classList.toggle('hidden', !ear);
+  $('jKeys').classList.toggle('hidden', ear);
+  jzFillItems();
+  const t = jzTempo(); $('jTempo').value = t; $('jTempoVal').textContent = t;
+  JZ.keys = jzOrder(); JZ.idx = 0; JZ.fails = 0;
+  $('result').classList.add('hidden');
+  if (ear) jeNew(); else jzShow();
+  jzSync();
+}
+function jzHidden() { return +S.jz.show === 2 || (+S.jz.show === 1 && JZ.idx > 0); }
+function jzMemo(html) { const m = $('memo'); m.innerHTML = `<div>${html}</div>`; m.classList.remove('hidden'); }
+function jzIdle() {
+  const vp = $('vp'); vp.classList.remove('review'); vp.scrollLeft = 0;
+  $('strip').style.transform = `translate3d(${staticPad().toFixed(1)}px,0,0)`;
+  $('ph').classList.add('hidden'); $('mask').classList.add('hidden'); $('count').classList.add('hidden'); $('memo').classList.add('hidden');
+}
+function jzMastKey() { return S.jz.type + ':' + JZ.item.id; }
+function jzChips() {
+  const m = S.jz.mast[jzMastKey()] || {};
+  $('jKeys').innerHTML = JZ.keys.map((pc, i) => `<span class="${i === JZ.idx ? 'cur ' : ''}${m[pc] == null ? '' : m[pc] >= 80 ? 'ok' : 'ko'}">${KFR[pc]}</span>`).join('');
+}
+function jzShow() {
+  const it = jzCur(); JZ.item = it;
+  const tr = transposeBars(itemBars(S.jz.type, it), JZ.keys[JZ.idx]);
+  JZ.piece = mkPiece(tr.bars, S.jz.swing); JZ.tonic = tr.tonic;
+  if (!render(JZ.piece, { fit: true })) return;
+  jzIdle();
+  if (jzHidden()) jzMemo(`<div class="big">En ${JZ.tonic}</div><div class="sub">${+S.jz.show === 2 ? 'Écoute, puis joue' : 'De mémoire'} — ${it.name}</div>`);
+  const m = S.jz.mast[jzMastKey()] || {}, done = Object.values(m).filter(v => v >= 80).length;
+  $('info').innerHTML = `<span class="tag">${it.name}</span><span class="tag plain">en ${JZ.tonic}</span><span class="tag plain">${JZ.idx + 1} / ${JZ.keys.length}</span>${S.jz.swing ? '<span class="tag plain">swing</span>' : ''}<span class="tag plain">${done} / 12 tonalités validées</span>`;
+  jzChips();
+  setStatus(CAN_MIC && +S.mic === 1 ? 'Prêt.' : 'Prêt (sans vérification au micro).');
+}
+function jzSync() {
+  const run = (RUN.on && RUN.o.jazz) || JZ.pending, ear = isEar();
+  if (ear) {
+    const busy = run || JE.phase === 'listening';
+    $('jStart').textContent = busy ? '■ Stop' : '▶︎ Écouter la phrase'; $('jStart').classList.toggle('stop', busy);
+    $('jHear').textContent = 'Voir la solution'; $('jHear').disabled = false; $('jNext').textContent = 'Phrase suivante →';
+  } else {
+    const hear = RUN.on && RUN.o.jazz && RUN.kind === 'hear' && !JZ.chain;
+    $('jStart').textContent = run && !hear ? '■ Stop' : '▶︎ Départ'; $('jStart').classList.toggle('stop', run && !hear);
+    $('jHear').textContent = hear ? '■ Stop' : '🔊 Écouter'; $('jNext').textContent = 'Tonalité suivante →';
+  }
+}
+function jzStop(msg) {
+  clearTimeout(JZ.to); JZ.chain = false; JZ.pending = false;
+  if (JE.phase === 'listening') { cancelAnimationFrame(JE.raf); }
+  if (JE.phase !== 'done') JE.phase = 'idle';
+  if (RUN.on && RUN.o.jazz) stopRun();
+  KEEP_MIC = false; closeMic();
+  jzSync(); if (msg) setStatus(msg);
+}
+function jzRun(kind) {
+  const hide = kind === 'play' && jzHidden();
+  if (hide) jzMemo(`<div class="big">En ${JZ.tonic}</div><div class="sub">${JZ.item.name}</div>`);
+  startRun(kind, { piece: JZ.piece, jazz: true, static: true, hide, bpm: jzTempo(), label: `${kind === 'hear' ? 'Écoute' : 'À toi'} · en <b>${JZ.tonic}</b>`, onDone: jzDone });
+}
+$('jStart').onclick = () => {
+  if (isEar()) { if ((RUN.on && RUN.o.jazz) || JE.phase === 'listening' || JZ.pending) { jzStop('Arrêté.'); return; } jePlay(); return; }
+  if (RUN.on || JZ.pending) { jzStop('Arrêté.'); jzShow(); return; }
+  clearTimeout(JZ.to); JZ.chain = true; JZ.fails = 0; KEEP_MIC = !!S.jz.auto;
+  jzRun(+S.jz.show === 2 ? 'hear' : 'play');
+};
+$('jHear').onclick = () => {
+  if (isEar()) { jeReveal(false); return; }
+  if (RUN.on) { jzStop('Arrêté.'); jzShow(); return; }
+  clearTimeout(JZ.to); JZ.chain = false; jzRun('hear');
+};
+$('jNext').onclick = () => {
+  jzStop();
+  JZ.idx = (JZ.idx + 1) % JZ.keys.length;
+  if (isEar()) { jeNew(); jePlay(); } else { JZ.fails = 0; jzShow(); }
+};
+function jzDone(r) {
+  $('ph').classList.add('hidden');
+  if (r.kind === 'hear') {
+    if (JZ.chain && +S.jz.show === 2) { jzLater(() => jzRun('play'), 250); return; }
+    setStatus('À toi quand tu veux.'); return;
+  }
+  $('memo').classList.add('hidden');   // on montre la partition corrigée
+  let msg = `En ${JZ.tonic} : terminé.`, pass = true;
+  if (r.useMic) {
+    const k = jzMastKey(), pc = JZ.keys[JZ.idx]; S.jz.mast[k] = S.jz.mast[k] || {};
+    S.jz.mast[k][pc] = Math.max(S.jz.mast[k][pc] || 0, r.pct); save(); jzChips();
+    pass = r.pct >= 80; msg = `En ${JZ.tonic} : <b>${r.pct} %</b>`;
+  }
+  const last = JZ.idx >= JZ.keys.length - 1;
+  if (JZ.chain && S.jz.auto) {
+    if (pass && !last) { setStatus(msg + ' · tonalité suivante…'); jzLater(() => { JZ.idx++; JZ.fails = 0; jzShow(); jzRun(+S.jz.show === 2 ? 'hear' : 'play'); }, 1700); return; }
+    if (!pass && ++JZ.fails < 3) { setStatus(msg + ' · on la refait…'); jzLater(() => { if (jzHidden()) jzMemo(`<div class="big">En ${JZ.tonic}</div><div class="sub">${JZ.item.name}</div>`); jzRun(+S.jz.show === 2 ? 'hear' : 'play'); }, 2200); return; }
+    msg += pass ? ' · série terminée 🎉' : ' · trois essais : baisse le tempo, ou passe à la suivante.';
+  }
+  jzStop(msg);
+}
+
+/* ---------- écoute et joue ---------- */
+const EAR_LV = [null,
+  { sc: ['pmin', 'pmaj'], len: [3, 4], leap: 1, chrom: 0 },
+  { sc: ['pmin', 'maj', 'dor', 'mixo'], len: [4, 5], leap: 1, chrom: 0 },
+  { sc: ['dor', 'mixo', 'maj', 'blues'], len: [5, 6], leap: 2, chrom: 0 },
+  { sc: ['dor', 'mixo', 'blues', 'lyd', 'mmel'], len: [6, 7], leap: 2, chrom: .2 },
+  { sc: ['bdom', 'alt', 'dimhw', 'mmel', 'lydb7', 'dor'], len: [7, 9], leap: 3, chrom: .25 }];
+function genEarPhrase(L) {
+  const lv = EAR_LV[L], sid = pick(lv.sc), sc = JZ_ITEMS.scale.find(s => s.id === sid), base = scaleNotes(sc.str);
+  const pool = base.concat(base.map(n => ({ dn: n.dn + 7, acc: n.acc })), [{ dn: base[0].dn + 14, acc: base[0].acc }]);
+  const M = n => midiOf(n.dn, n.acc), n = rint(lv.len[0], lv.len[1]);
+  let i = pick([0, 2, Math.min(4, base.length - 1), base.length]), dir = pick([1, -1]), guard = 0;
+  const seq = [pool[i]];
+  while (seq.length < n && guard++ < 200) {
+    if (rnd() < .3) dir = -dir;
+    const st = rnd() < .7 ? 1 : rint(2, lv.leap + 1);
+    let j = i + dir * st;
+    if (j < 0 || j >= pool.length) { dir = -dir; j = i + dir * st; }
+    if (j < 0 || j >= pool.length || M(pool[j]) === M(seq[seq.length - 1])) continue;
+    if (lv.chrom && rnd() < lv.chrom && seq.length < n - 1) {
+      const t = pool[j], a = { dn: t.dn - 1, acc: M(t) - 1 - midiOf(t.dn - 1, 0) };
+      if (Math.abs(a.acc) <= 1 && M(a) !== M(seq[seq.length - 1])) seq.push(a);
+    }
+    seq.push(pool[j]); i = j;
+  }
+  return { seq, sc };
+}
+function jeSlots() { const el = document.getElementById('jeSlots'); if (el) el.innerHTML = JE.midis.map((m, i) => `<i class="${i < JE.pos ? 'ok' : ''}"></i>`).join(''); }
+function jeNew() {
+  const ph = genEarPhrase(S.jz.level), tr = transposeBars(packEighths(ph.seq, ph.sc.ch), JZ.keys[JZ.idx % JZ.keys.length]);
+  JE.piece = mkPiece(tr.bars, S.jz.swing);
+  if (!render(JE.piece, { fit: true })) return;
+  jzIdle();
+  const first = JE.piece.flat.find(e => !e.rest), fm = midiOf(first.dn, first.acc);
+  JE.midis = buildTimeline(JE.piece, 100).notes.map(n => n.midi);
+  Object.assign(JE, { phase: 'idle', pos: 0, tries: 0, name: `${tr.tonic} ${ph.sc.name.toLowerCase()}` });
+  const firstTxt = FR[lt(first.dn)] + (first.acc === 1 ? '♯' : first.acc === -1 ? '♭' : '') + (fm < 60 ? ' grave' : fm >= 72 ? ' aigu' : ' médium');
+  jzMemo(`<div class="big">${JE.name}</div><div class="sub">${JE.midis.length} notes${+S.jz.help === 1 ? ' · première note : ' + firstTxt : ''}</div><div class="slots" id="jeSlots"></div>`);
+  jeSlots();
+  $('info').innerHTML = `<span class="tag">Écoute et joue · niveau ${S.jz.level}</span><span class="tag plain">${S.jz.ear[S.jz.level] || 0} phrase${(S.jz.ear[S.jz.level] || 0) > 1 ? 's' : ''} trouvée${(S.jz.ear[S.jz.level] || 0) > 1 ? 's' : ''} du premier coup à ce niveau</span>`;
+  setStatus('Écoute la phrase, puis rejoue-la.');
+}
+function jePlay() {
+  if (RUN.on) return;
+  cancelAnimationFrame(JE.raf); clearTimeout(JZ.to); JZ.pending = false;
+  if (JE.phase === 'done') { jeNew(); }
+  JE.phase = 'playing'; JE.pos = 0; jeSlots(); KEEP_MIC = true;
+  startRun('hear', { piece: JE.piece, jazz: true, static: true, hide: true, bpm: jzTempo(), label: 'Écoute… 👂', onDone: jeListen });
+}
+async function jeListen() {
+  $('memo').classList.remove('hidden'); $('ph').classList.add('hidden');
+  if (!(CAN_MIC && +S.mic === 1)) { JE.phase = 'idle'; KEEP_MIC = false; jzSync(); setStatus('À toi ! Puis « Voir la solution » pour vérifier.'); return; }
+  try { await openMic(); } catch (e) { JE.phase = 'idle'; jzSync(); setStatus('Micro refusé. Joue, puis « Voir la solution ».'); return; }
+  Object.assign(JE, { phase: 'listening', pos: 0, cand: null, cnt: 0, sil: 0, wait: false, last: null });
+  jeSlots(); jzSync(); setStatus('À toi 🎺 <span class="meter"><i class="lvl"></i></span>');
+  JE.raf = requestAnimationFrame(jeLoop);
+}
+function jeLoop() {
+  if (JE.phase !== 'listening' || !mic) return;
+  const r = yin(readMic(), actx.sampleRate);
+  document.querySelectorAll('.lvl').forEach(lv => lv.style.transform = `scaleX(${Math.min(1, r.rms * 8).toFixed(2)})`);
+  const w = r.f && r.rms > 0.012 ? Math.round(69 + 12 * Math.log2(r.f / 440)) + transp() : null;
+  if (w == null) { if (++JE.sil > 24) JE.wait = false; JE.cand = null; JE.cnt = 0; }
+  else {
+    JE.sil = 0;
+    if (w === JE.cand) JE.cnt++; else { JE.cand = w; JE.cnt = 1; }
+    if (!JE.wait) {
+      const exp = JE.midis[JE.pos];
+      if (JE.cnt === 3 && w === exp) { JE.pos++; JE.last = w; jeSlots(); if (JE.pos >= JE.midis.length) { jeWin(); return; } }
+      else if (JE.cnt === 8 && w !== exp && w !== JE.last && w >= 50 && w <= 90) {
+        JE.tries++; JE.pos = 0; JE.last = null; JE.wait = true; jeSlots();
+        setStatus('✗ Ce n\'est pas ça : reprends au début, ou réécoute. <span class="meter"><i class="lvl"></i></span>');
+      }
+    }
+  }
+  JE.raf = requestAnimationFrame(jeLoop);
+}
+function jeReveal(won) {
+  if (!JE.piece) return;
+  clearTimeout(JZ.to); JZ.pending = false; cancelAnimationFrame(JE.raf);
+  if (RUN.on && RUN.o.jazz) stopRun();
+  JE.phase = 'done'; KEEP_MIC = false; closeMic();
+  $('memo').classList.add('hidden'); $('ph').classList.add('hidden');
+  JE.piece.flat.forEach(e => { if (!e.rest) color(e, won ? '#1E8E50' : '#1E1912'); });
+  jzSync();
+  if (!won) setStatus(`La solution : ${JE.name}.`);
+}
+function jeWin() {
+  const tries = JE.tries;
+  if (tries === 0) { S.jz.ear[S.jz.level] = (S.jz.ear[S.jz.level] || 0) + 1; save(); }
+  const auto = !!S.jz.auto;
+  jeReveal(true);
+  setStatus(tries === 0 ? 'Trouvé du premier coup 🎯' : `Trouvé après ${tries} reprise${tries > 1 ? 's' : ''} 👏`);
+  if (auto) jzLater(() => { JZ.idx = (JZ.idx + 1) % JZ.keys.length; jeNew(); jePlay(); }, 2600);
+}
+
+fillControls(); jzFillControls(); renderJournal();
+if (VFlib()) showTab(S.tab); else $('loadErr').classList.remove('hidden');
 </script>
 </body>
 </html>
