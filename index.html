@@ -1192,6 +1192,8 @@ pad.addEventListener('pointerdown', e => { e.preventDefault(); try { pad.setPoin
 pad.addEventListener('pointerup', e => padUp(evTime(e), e.pointerId));
 pad.addEventListener('pointercancel', e => padUp(evTime(e), e.pointerId));
 pad.addEventListener('contextmenu', e => e.preventDefault());
+// iPhone : empêche le zoom « double-tap » qui avalait des frappes
+[pad, $('calPad'), $('npTouch')].forEach(el => { el.addEventListener('touchstart', e => e.preventDefault(), { passive: false }); el.addEventListener('touchend', e => e.preventDefault(), { passive: false }); });
 document.addEventListener('keydown', e => {
   if (e.repeat || (e.code !== 'Space' && e.code !== 'Enter')) return;
   if (current === 'rhythm-play' && RG.running && RG.kind === 'tap') { e.preventDefault(); padDown(performance.now(), 'kb'); }
