@@ -44,8 +44,11 @@ header .sub{font-size:14px;color:var(--muted);font-weight:600}
 .tag.plain{background:#EFE6D6;color:var(--ink)}
 #vp{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 8px 20px -14px rgba(30,25,18,.35)}
 #vp.review{overflow-x:auto;-webkit-overflow-scrolling:touch}
-#strip{will-change:transform;transform-origin:0 0}
+#strip{position:relative}
 #strip svg{display:block}
+.chunk{position:absolute;left:0;top:0;will-change:transform}
+#strip.flow{display:flex;height:auto!important}
+#strip.flow .chunk{position:static;display:block!important;transform:none!important;flex:none}
 #ph{position:absolute;top:8px;bottom:8px;width:3px;border-radius:2px;background:var(--brass);opacity:.85;pointer-events:none}
 #mask{position:absolute;top:0;bottom:0;left:0;background:var(--paper);opacity:.93;pointer-events:none;border-right:1px solid var(--line)}
 #count{position:absolute;inset:0;display:grid;place-items:center;font-size:92px;font-weight:900;color:var(--brass);pointer-events:none;text-shadow:0 2px 0 #fff}
@@ -95,13 +98,13 @@ th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mu
   <div id="pSight" class="card">
     <div class="grid">
       <div class="fld"><label for="fStyle">Style</label><select id="fStyle">
-        <option value="c">Classique</option><option value="m">Marche / harmonie</option><option value="s">Swing</option><option value="l">Latin</option><option value="f">Funk</option></select></div>
+        <optgroup label="Lecture"><option value="c">Classique</option><option value="m">Marche / harmonie</option><option value="s">Swing</option><option value="l">Latin</option><option value="f">Funk</option></optgroup><optgroup label="Jazz sur grille d'accords"><option value="bl">Blues (12 mesures)</option><option value="st">Standard swing (AABA)</option><option value="bb">Bebop</option><option value="ba">Ballade</option><option value="bo">Bossa nova</option><option value="jw">Valse jazz</option><option value="mo">Modal</option></optgroup></select></div>
       <div class="fld"><label for="fLevel">Niveau</label><select id="fLevel"></select></div>
       <div class="fld"><label for="fMeter">Mesure</label><select id="fMeter">
         <option value="auto">Auto</option><option>4/4</option><option>3/4</option><option>2/4</option><option>6/8</option></select></div>
       <div class="fld"><label for="fKey">Armure</label><select id="fKey"></select></div>
       <div class="fld"><label for="fBars">Longueur</label><select id="fBars">
-        <option value="8">8 mesures</option><option value="12">12 mesures</option><option value="16">16 mesures</option><option value="24">24 mesures</option><option value="32">32 mesures</option></select></div>
+        <option value="8">8 mesures</option><option value="12">12 mesures</option><option value="16">16 mesures</option><option value="24">24 mesures</option><option value="32">32 mesures</option><option value="m2">Morceau d'environ 2 min</option><option value="m3">Morceau d'environ 3 min</option></select></div>
       <div class="fld"><label for="fTempo">Tempo <span id="tempoUnit"></span></label><div class="tempo"><input type="range" id="fTempo" min="40" max="200" step="2"><b id="tempoVal"></b></div></div>
       <div class="fld"><label for="fLook">Regard</label><select id="fLook">
         <option value="0">Tout visible</option><option value="1">Masquer les notes passées</option><option value="2">Masquer jusqu'à 1 temps devant</option></select></div>
@@ -323,8 +326,8 @@ const CELLS68 = [ // par temps (noire pointée = 18 ticks)
   [1, [6, 12], 4, 3], [1, [12, -6], 4, 2], [1, [-6, 6, 6], 5, 2], [1, [9, 3, 6], 5, 4.5], [1, [6, 3, 3, 6], 5, 3],
   [1, [6, 6, 3, 3], 5, 3], [1, [3, 3, 3, 3, 3, 3], 6, 2], [1, [6, -6, 6], 6, 2]
 ];
-const TEMPI = { c: [60, 66, 72, 76, 84, 92, 100, 112], m: [72, 80, 88, 96, 104, 112, 116, 120], s: [80, 90, 100, 112, 124, 138, 152, 168], l: [80, 88, 96, 104, 112, 120, 128, 138], f: [66, 72, 78, 84, 90, 96, 104, 112] };
-const STYLE_NAME = { c: 'Classique', m: 'Marche', s: 'Swing', l: 'Latin', f: 'Funk' };
+const TEMPI = { c: [60, 66, 72, 76, 84, 92, 100, 112], m: [72, 80, 88, 96, 104, 112, 116, 120], s: [80, 90, 100, 112, 124, 138, 152, 168], l: [80, 88, 96, 104, 112, 120, 128, 138], f: [66, 72, 78, 84, 90, 96, 104, 112], bl: [84, 96, 108, 120, 132, 144, 160, 176], st: [80, 90, 100, 112, 124, 138, 152, 168], bb: [100, 112, 126, 140, 160, 180, 200, 220], ba: [56, 58, 60, 63, 66, 69, 72, 76], bo: [90, 100, 108, 116, 124, 132, 140, 150], jw: [84, 92, 100, 112, 124, 136, 148, 160], mo: [100, 108, 116, 126, 138, 150, 164, 180] };
+const STYLE_NAME = { c: 'Classique', m: 'Marche', s: 'Swing', l: 'Latin', f: 'Funk', bl: 'Blues', st: 'Standard swing', bb: 'Bebop', ba: 'Ballade', bo: 'Bossa nova', jw: 'Valse jazz', mo: 'Modal' };
 
 /* ---------- génération ---------- */
 function genPiece(o) {
@@ -335,7 +338,7 @@ function genPiece(o) {
   let n = o.keyN;
   if (n === 'auto') { const mx = [0, 0, 1, 2, 3, 4, 5, 6, 6][L]; n = rint(-mx, mx); }
   n = +n;
-  const modeK = st === 'c' ? (L >= 3 ? pick(['major', 'major', 'minor']) : 'major') : st === 'm' ? 'major' : st === 's' ? (L >= 3 ? pick(['major', 'mixo', 'dorian']) : 'major') : st === 'l' ? (L >= 3 ? pick(['major', 'minor', 'dorian']) : 'major') : (L >= 2 ? pick(['dorian', 'minor', 'mixo']) : 'major');
+  const modeK = o.mode ? o.mode : st === 'c' ? (L >= 3 ? pick(['major', 'major', 'minor']) : 'major') : st === 'm' ? 'major' : st === 's' ? (L >= 3 ? pick(['major', 'mixo', 'dorian']) : 'major') : st === 'l' ? (L >= 3 ? pick(['major', 'minor', 'dorian']) : 'major') : (L >= 2 ? pick(['dorian', 'minor', 'mixo']) : 'major');
   const ka = keyAcc(n), tonicL = (majTonic(n) + MODE[modeK][0]) % 7;
   const swing = st === 's' && !compound;
 
@@ -415,58 +418,282 @@ function genPiece(o) {
     if ((a && a.dn === e.dn + 1) || (b && b.dn === e.dn + 1)) e.acc += 1;
   });
   const tonicName = FR[tonicL] + (ka[tonicL] === 1 ? '♯' : ka[tonicL] === -1 ? '♭' : '');
-  return { bars, flat, meter, compound, nb, beatT, barT, n, keyName: KEYNAME[n], label: tonicName + ' ' + MODE[modeK][1], swing, style: st, level: L, total: T };
+  return { bars, flat, meter, compound, nb, beatT, barT, n, keyName: KEYNAME[n], label: tonicName + ' ' + MODE[modeK][1], swing, style: st, level: L, total: T, modeK };
+}
+
+/* =========================================================
+   MORCEAUX LONGS (formes, grilles d'accords)
+   ========================================================= */
+const QUAL = {
+  maj7: { t: [0, 4, 7, 11], s: [0, 2, 4, 5, 7, 9, 11], n: 'maj7' },
+  '6': { t: [0, 4, 7, 9], s: [0, 2, 4, 5, 7, 9, 11], n: '6' },
+  '7': { t: [0, 4, 7, 10], s: [0, 2, 4, 5, 7, 9, 10], n: '7' },
+  m7: { t: [0, 3, 7, 10], s: [0, 2, 3, 5, 7, 9, 10], n: 'm7' },
+  m7b5: { t: [0, 3, 6, 10], s: [0, 1, 3, 5, 6, 8, 10], n: 'm7♭5' }
+};
+// Grilles génériques, écrites en Do puis transposées
+const JAZZ_FORMS = {
+  bl: { name: 'Blues', meter: '4/4', sw: 's', swing: true, end: 'C7', form: ['A'], secs: { A: ['C7', 'F7', 'C7', 'C7', 'F7', 'F7', 'C7', 'A7', 'Dm7', 'G7', 'C7 A7', 'Dm7 G7'] } },
+  st: { name: 'Standard swing', meter: '4/4', sw: 's', swing: true, end: 'C6', form: ['A', 'A', 'B', 'A'], secs: { A: ['Cmaj7 Am7', 'Dm7 G7', 'Em7 A7', 'Dm7 G7', 'Gm7 C7', 'Fmaj7 Fm7', 'Em7 A7', 'Dm7 G7'], B: ['E7', 'E7', 'A7', 'A7', 'D7', 'D7', 'G7', 'G7'] } },
+  bb: { name: 'Bebop', meter: '4/4', sw: 's', swing: true, dL: 1, end: 'C6', form: ['A', 'A', 'B', 'A'], secs: { A: ['Cmaj7 A7', 'Dm7 G7', 'Em7 A7', 'Dm7 G7', 'Gm7 C7', 'Fmaj7 Fm7', 'Em7 A7', 'Dm7 G7'], B: ['E7', 'E7', 'A7', 'A7', 'D7', 'D7', 'Dm7', 'G7'] } },
+  ba: { name: 'Ballade', meter: '4/4', sw: 'c', swing: true, soft: true, end: 'Cmaj7', form: ['A', 'B'], secs: { A: ['Cmaj7', 'Am7', 'Dm7', 'G7', 'Em7', 'A7', 'Dm7', 'G7'], B: ['Fmaj7', 'Fm7', 'Em7', 'A7', 'Dm7', 'G7', 'Cmaj7', 'Dm7 G7'] } },
+  bo: { name: 'Bossa nova', meter: '4/4', sw: 'l', swing: false, soft: true, end: 'Cmaj7', form: ['A', 'A', 'B', 'A'], secs: { A: ['Cmaj7', 'Cmaj7', 'D7', 'D7', 'Dm7', 'G7', 'Cmaj7', 'Dm7 G7'], B: ['Fmaj7', 'Fmaj7', 'Em7', 'A7', 'Dm7', 'Dm7', 'Dm7b5', 'G7'] } },
+  jw: { name: 'Valse jazz', meter: '3/4', sw: 's', swing: true, end: 'Cmaj7', form: ['A', 'A', 'B', 'A'], secs: { A: ['Cmaj7', 'Am7', 'Dm7', 'G7', 'Em7', 'A7', 'Dm7', 'G7'], B: ['Fmaj7', 'Fm7', 'Em7', 'A7', 'Dm7', 'G7', 'Cmaj7', 'G7'] } },
+  mo: { name: 'Modal', meter: '4/4', sw: 's', swing: true, end: 'Dm7', form: ['A', 'A', 'B', 'A'], secs: { A: ['Dm7', 'Dm7', 'Dm7', 'Dm7', 'Dm7', 'Dm7', 'Dm7', 'Dm7'], B: ['Fm7', 'Fm7', 'Fm7', 'Fm7', 'Fm7', 'Fm7', 'Fm7', 'Fm7'] } }
+};
+const isJazzStyle = st => !!JAZZ_FORMS[st];
+function parseChord(tok) { const m = /^([A-G])([#b]?)(.*)$/.exec(tok); return { r: PCS['CDEFGAB'.indexOf(m[1])] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0), q: QUAL[m[3]], src: tok }; }
+function copyBars(bars) {
+  const tm = new Map();
+  return bars.map(b => b.map(e => { const c = { ticks: e.ticks, rest: e.rest, dn: e.dn, acc: e.acc, tie: e.tie, tup: null, chT: e.chT }; if (e.tup) { if (!tm.has(e.tup)) tm.set(e.tup, {}); c.tup = tm.get(e.tup); } return c; }));
+}
+function finishPiece(bars, base) {
+  const flat = []; let T = 0;
+  bars.forEach((b, bi) => b.forEach(e => { e.bar = bi; e.T = T; T += e.ticks; flat.push(e); }));
+  flat.forEach((e, i) => { if (e.tie && flat[i + 1] && !flat[i + 1].rest) flat[i + 1].tiedFrom = true; else e.tie = false; });
+  return Object.assign(base, { bars, flat, total: T });
+}
+// une respiration : le dernier temps de la mesure devient un silence quand c'est possible
+function breathe(bar, barT, beatT) {
+  let T = 0; const st = bar.map(e => { const s = T; T += e.ticks; return s; });
+  const cut = barT - beatT, k = st.findIndex(s => s >= cut);
+  if (k > 0 && st[k] === cut) {
+    if (bar[k - 1].tie || bar.slice(k).some(e => e.tie)) return;
+    bar.splice(k, bar.length - k, { ticks: beatT, rest: true, tup: null }); return;
+  }
+  const last = bar[bar.length - 1];
+  if (!last.rest && !last.tie && !last.tup && last.ticks > beatT && DUR[last.ticks - beatT]) { last.ticks -= beatT; bar.push({ ticks: beatT, rest: true, tup: null }); }
+}
+function rhythmBar(L, sw, nb) {
+  const bar = []; let beat = 0, g = 0;
+  while (beat < nb && g++ < 50) {
+    const cell = wpick(CELLS.filter(c => {
+      if (c[2] > L || c[0] > nb - beat) return false;
+      if (c[0] === 2) return nb === 4 ? beat % 2 === 0 : nb === 3 ? beat <= 1 : beat === 0;
+      if (c[0] === 3) return beat === 0 || (nb === 4 && beat === 1);
+      if (c[0] === 4) return beat === 0 && nb === 4;
+      return true;
+    }), c => c[3][sw] * (c[2] >= L - 1 ? 1.5 : 1) * (L >= 5 && c[2] <= 1 && c[1][0] > 0 ? .6 : 1));
+    const tup = cell[4] === 't' ? {} : null;
+    for (const t of cell[1]) bar.push({ ticks: Math.abs(t), rest: t < 0, tup });
+    beat += cell[0];
+  }
+  if (bar.every(e => e.rest)) bar[0].rest = false;
+  return bar;
+}
+function spellNear(m, dn) { // écrit la hauteur m au plus près de la position dn, avec au plus une altération
+  for (const d of [dn, dn + 1, dn - 1, dn + 2, dn - 2]) { const acc = m - midiOf(d, 0); if (Math.abs(acc) <= 1) return { dn: d, acc, m }; }
+  return { dn, acc: 0, m: midiOf(dn, 0) };
+}
+function makePools(homePc, ka, lo, hi) {
+  const cache = {};
+  return ch => {
+    if (cache[ch.src]) return cache[ch.src];
+    const rootPc = ((homePc + ch.r) % 12 + 12) % 12;
+    let rl = -1;
+    for (let l = 0; l < 7; l++) if (((PCS[l] + ka[l]) % 12 + 12) % 12 === rootPc) rl = l;
+    if (rl < 0) for (const l of [1, 2, 4, 5, 6]) if ((PCS[l] + 11) % 12 === rootPc) rl = l;      // Ré♭ Mi♭ Sol♭ La♭ Si♭
+    if (rl < 0) for (let l = 0; l < 7; l++) if ((PCS[l] + 1) % 12 === rootPc) rl = l;
+    const out = [];
+    ch.q.s.forEach((semi, i) => {
+      let l = (rl + i) % 7; const pc = (rootPc + semi) % 12;
+      let acc = ((pc - PCS[l]) % 12 + 12) % 12; if (acc > 6) acc -= 12;
+      if (acc > 1) { l = (l + 1) % 7; acc = ((pc - PCS[l]) % 12 + 12) % 12; if (acc > 6) acc -= 12; }
+      else if (acc < -1) { l = (l + 6) % 7; acc = ((pc - PCS[l]) % 12 + 12) % 12; if (acc > 6) acc -= 12; }
+      const ct = ch.q.t.includes(semi);
+      for (let o = 3; o <= 6; o++) { const dn = o * 7 + l, m = midiOf(dn, acc); if (m >= lo && m <= hi) out.push({ dn, acc, m, ct, root: semi === 0 }); }
+    });
+    const rootName = FR[rl] ? CH_STD[rootPc] : CH_STD[rootPc];
+    return cache[ch.src] = { notes: out.sort((a, b) => a.m - b.m), label: rootName + ch.q.n };
+  };
+}
+// une section : rythme + ligne mélodique qui vise les notes de l'accord sur les temps forts
+function genSection(chs, L, F, G) {
+  const nb = G.nb, barT = nb * 12, sw = F.sw;
+  const bars = [];
+  chs.forEach((_, b) => {
+    let bar;
+    if (b >= 4 && b % 4 < 2 && rnd() < .6) bar = bars[b - 4].map(e => ({ ticks: e.ticks, rest: e.rest, tup: e.tup ? e.tup : null }));
+    else bar = rhythmBar(L, sw, nb);
+    if (bar[0].tup) { const tm = new Map(); bar.forEach(e => { if (e.tup) { if (!tm.has(e.tup)) tm.set(e.tup, {}); e.tup = tm.get(e.tup); } }); }
+    bars.push(bar);
+  });
+  bars.forEach(bar => { const tm = new Map(); bar.forEach(e => { if (e.tup) { if (!tm.has(e.tup)) tm.set(e.tup, {}); e.tup = tm.get(e.tup); } }); });
+  if (bars[0][0].rest && bars[0][0].ticks >= 24) bars[0][0].rest = false;
+  bars.forEach((bar, b) => { if (b % 4 === 3) breathe(bar, barT, 12); });
+  const flat = []; let T = 0;
+  bars.forEach((bar, bi) => bar.forEach(e => { e.b = bi; e.T = T; T += e.ticks; flat.push(e); }));
+  const tieP = L < 4 ? 0 : (F.soft ? .1 : .2);
+  for (let i = 0; i < flat.length - 1; i++) { const a = flat[i], c = flat[i + 1]; if (!a.rest && !c.rest && !a.tup && !c.tup && c.T % 12 === 0 && a.ticks <= 12 && c.ticks <= 24 && !a.tiedFrom && rnd() < tieP) { a.tie = true; c.tiedFrom = true; } }
+  const chordOf = e => { const cs = chs[e.b], inBar = e.T - e.b * barT; return cs.length === 1 || inBar < (nb === 3 ? 24 : barT / 2) ? cs[0] : cs[1]; };
+  // accords chiffrés
+  let lastLab = null;
+  chs.forEach((cs, b) => cs.forEach((ch, ci) => {
+    const lab = G.pool(ch).label; if (lab === lastLab) return; lastLab = lab;
+    const from = b * barT + (ci === 0 ? 0 : (nb === 3 ? 24 : barT / 2)), to = cs.length === 1 || ci === 1 ? (b + 1) * barT : from + (nb === 3 ? 24 : barT / 2);
+    const e = flat.find(x => x.T >= from && x.T < to); if (e) e.chT = lab;
+  }));
+  // hauteurs
+  const snd = flat.filter(e => !e.rest), pChrom = (L >= 7 ? .3 : L >= 5 ? .22 : L >= 3 ? .12 : 0) * (F.soft ? .5 : 1);
+  let cur = G.start, dir = pick([1, -1]), forced = null, prev = null;
+  const strong = e => { const inBar = e.T % barT; return (nb === 3 ? inBar === 0 : inBar % 24 === 0) || e.ticks >= 12; };
+  const nearest = (notes, m, f) => { let bi = -1, bd = 1e9; notes.forEach((n, i) => { if (f && !f(n)) return; const d = Math.abs(n.m - m); if (d < bd) { bd = d; bi = i; } }); return bi; };
+  snd.forEach((e, i) => {
+    if (e.tiedFrom && prev) { e.dn = prev.dn; e.acc = prev.acc; return; }
+    const notes = G.pool(chordOf(e)).notes;
+    let p;
+    if (forced && notes.some(n => n.m === forced.m)) { p = forced; forced = null; }
+    else {
+      forced = null;
+      if (cur < G.lo + 5) dir = 1; else if (cur > G.hi - 4) dir = -1; else if (rnd() < .3) dir = -dir;
+      const r = rnd(), step = r < .58 ? 1 : r < .84 ? 2 : (L >= 5 && r > .95 ? 4 : 3);
+      let j = nearest(notes, cur) + dir * step;
+      if (j < 0 || j >= notes.length) { dir = -dir; j = nearest(notes, cur) + dir * step; }
+      j = Math.max(0, Math.min(notes.length - 1, j));
+      if (i === 0 || strong(e)) { const k = nearest(notes, notes[j].m, n => n.ct); if (k >= 0) j = k; }
+      if (notes[j].m === cur && prev && !prev.tie) { const k = j + dir; if (k >= 0 && k < notes.length) j = k; else if (j - dir >= 0 && j - dir < notes.length) j -= dir; }
+      p = notes[j];
+      // approche chromatique de la prochaine note d'accord
+      const nx = snd[i + 1];
+      if (nx && !nx.tiedFrom && !e.tie && e.ticks <= 6 && strong(nx) && rnd() < pChrom) {
+        const nn = G.pool(chordOf(nx)).notes, k = nearest(nn, p.m, n => n.ct && n.m !== p.m);
+        if (k >= 0 && Math.abs(nn[k].m - p.m) <= 4) {
+          const t = nn[k], am = t.m + (p.m > t.m ? 1 : -1), a = spellNear(am, t.dn + (p.m > t.m ? 1 : -1));
+          if (a.m === am && am !== cur && am >= G.lo && am <= G.hi) { p = a; forced = t; }
+        }
+      }
+    }
+    cur = p.m; e.dn = p.dn; e.acc = p.acc; prev = e;
+  });
+  return bars.map(bar => bar.map(e => ({ ticks: e.ticks, rest: e.rest, tup: e.tup, dn: e.dn, acc: e.acc, tie: e.tie, chT: e.chT })));
+}
+function pieceBpm(st, L, compound) { const k = st + L + (compound ? 'c' : ''); const d = TEMPI[st][L - 1]; return S.tempo[k] || (compound ? Math.round(d * .62 / 2) * 2 : d); }
+function genJazz(o) {
+  const F = JAZZ_FORMS[o.style], L = o.level, nb = +F.meter[0], barT = nb * 12;
+  let n = o.keyN;
+  if (n === 'auto') n = pick(L <= 2 ? [0, 1, -1] : L <= 4 ? [0, 1, -1, -2, 2] : [0, 1, -1, -2, 2, -3, 3, -4]);
+  n = +n;
+  const ka = keyAcc(n), tl = majTonic(n), homePc = ((PCS[tl] + ka[tl]) % 12 + 12) % 12;
+  const lo = Math.max(54, +o.lo, [0, 60, 59, 57, 55, 54, 54, 54, 54][L]), hi = Math.min(+o.hi, [0, 72, 76, 79, 81, 83, 84, 84, 84][L]);
+  const G = { nb, lo, hi, pool: makePools(homePc, ka, lo, hi), start: Math.round((lo + hi) / 2) };
+  const secCh = {}; Object.keys(F.secs).forEach(k => secCh[k] = F.secs[k].map(s => s.split(' ').map(parseChord)));
+  const chorusBars = F.form.reduce((a, k) => a + secCh[k].length, 0);
+  const bpm = pieceBpm(o.style, L, false), barSec = nb * 60 / bpm;
+  const long = typeof o.bars === 'string';
+  const nCh = long ? Math.max(2, Math.round((o.bars === 'm3' ? 180 : 120) / (chorusBars * barSec))) : Math.ceil(o.bars / chorusBars);
+  const Lt = Math.max(1, L - 1), Ls = Math.min(8, L + (F.dL || 0));
+  const themeSecs = {}; Object.keys(secCh).forEach(k => themeSecs[k] = genSection(secCh[k], long ? Lt : Ls, F, G));
+  const bars = [], marks = {};
+  for (let c = 0; c < nCh; c++) {
+    const theme = c === 0 || (long && nCh >= 3 && c === nCh - 1);
+    marks[bars.length] = theme ? 'Thème' : 'Chorus ' + (c + 1);
+    F.form.forEach(k => { bars.push(...(theme ? copyBars(themeSecs[k]) : genSection(secCh[k], Ls, F, G))); });
+  }
+  if (!long) { bars.length = Math.min(bars.length, o.bars); Object.keys(marks).forEach(k => { if (+k >= bars.length) delete marks[k]; }); if (nCh === 1) delete marks[0]; }
+  // fin : note longue sur la fondamentale de l'accord final
+  const endCh = parseChord(F.end), ep = G.pool(endCh), roots = ep.notes.filter(x => x.root);
+  let lastM = G.start; for (let b = bars.length - 2; b >= 0 && lastM === G.start; b--) for (const e of bars[b]) if (!e.rest) lastM = midiOf(e.dn, e.acc);
+  const rt = roots.length ? roots.reduce((a, b) => Math.abs(b.m - lastM) < Math.abs(a.m - lastM) ? b : a) : ep.notes[0];
+  if (bars.length > 1) { const pv = bars[bars.length - 2]; pv.forEach(e => { e.tie = false; }); }
+  bars[bars.length - 1] = [{ ticks: barT, rest: false, tup: null, dn: rt.dn, acc: rt.acc, chT: ep.label }];
+  const tonic = FR[tl] + (ka[tl] === 1 ? '♯' : ka[tl] === -1 ? '♭' : '');
+  const desc = long ? (nCh >= 3 ? `Thème · ${nCh - 2} chorus · Thème` : 'Thème · 1 chorus') : '';
+  return finishPiece(bars, { meter: F.meter, compound: false, nb, beatT: 12, barT, n, keyName: KEYNAME[n], label: 'en ' + tonic, swing: F.swing, style: o.style, level: L, marks, desc });
+}
+function genLongForm(o) {
+  const first = genPiece(Object.assign({}, o, { bars: 8 }));
+  const fixed = Object.assign({}, o, { bars: 8, meter: first.meter, keyN: first.n, mode: first.modeK });
+  const secs = { A: first.bars, B: genPiece(fixed).bars, C: genPiece(fixed).bars };
+  const bpm = pieceBpm(o.style, o.level, first.compound), barSec = first.nb * 60 / bpm;
+  const nSec = Math.max(4, Math.min(16, Math.round((o.bars === 'm3' ? 180 : 120) / (8 * barSec))));
+  const seq = ['A', 'A', 'B', 'A', 'C', 'A', 'B', 'A', 'C', 'A', 'B', 'A', 'C', 'A', 'B', 'A'].slice(0, nSec); seq[seq.length - 1] = 'A'; if (seq.length > 4 && seq[seq.length - 2] === 'A') seq[seq.length - 2] = 'B';
+  const bars = [], marks = {};
+  seq.forEach((k, si) => {
+    const cb = copyBars(secs[k]); marks[bars.length] = k;
+    cb.forEach((bar, b) => { if (b % 4 === 3 && b < 7) breathe(bar, first.barT, first.beatT); });
+    if (si < seq.length - 1) breathe(cb[7], first.barT, first.beatT);
+    bars.push(...cb);
+  });
+  return finishPiece(bars, { meter: first.meter, compound: first.compound, nb: first.nb, beatT: first.beatT, barT: first.barT, n: first.n, keyName: first.keyName, label: first.label, swing: first.swing, style: o.style, level: o.level, marks, desc: 'Forme ' + seq.join(' ') });
 }
 
 /* ---------- gravure (VexFlow) ---------- */
 const DUR = { 48: 'w', 36: 'hd', 24: 'h', 18: 'qd', 12: 'q', 9: '8d', 6: '8', 3: '16', 4: '8', 8: 'q' };
 let PIECE = null, VIEW = null;
 function VFlib() { return (window.Vex && (window.Vex.Flow || window.Vex)) || window.VexFlow || null; }
+const CH_BARS = 6;
 function render(piece, o) {
   o = o || {};
   const VF = VFlib(); if (!VF) { $('loadErr').classList.remove('hidden'); return false; }
-  const host = $('strip'); host.innerHTML = '';
+  const host = $('strip'); host.innerHTML = ''; host.classList.remove('flow');
   const wOf = e => e.ticks >= 24 ? 48 : e.ticks >= 12 ? 42 : e.ticks >= 6 ? 36 : 31;
   const widths = piece.bars.map((b, i) => (i === 0 ? 96 + Math.abs(piece.n) * 13 : 0) + 34 + b.reduce((a, e) => a + wOf(e), 0) + (b.length === 1 ? 50 : 0));
-  const total = widths.reduce((a, b) => a + b, 0) + 30, H = 170;
-  const renderer = new VF.Renderer(host, VF.Renderer.Backends.SVG); renderer.resize(total, H);
-  const c = renderer.getContext();
-  let x = 10; const ties = [];
-  piece.bars.forEach((bar, i) => {
-    const stave = new VF.Stave(x, 32, widths[i]);
-    if (i === 0) stave.addClef('treble').addKeySignature(piece.keyName).addTimeSignature(piece.meter);
-    if (i === piece.bars.length - 1) stave.setEndBarType(VF.Barline.type.END);
-    stave.setContext(c).draw();
-    const notes = bar.map(e => {
-      const d = DUR[e.ticks];
-      const key = e.rest ? 'b/4' : LET[lt(e.dn)] + (e.acc === 1 ? '#' : e.acc === -1 ? 'b' : '') + '/' + Math.floor(e.dn / 7);
-      const sn = new VF.StaveNote({ keys: [key], duration: d + (e.rest ? 'r' : ''), auto_stem: true });
-      if (d.includes('d')) VF.Dot.buildAndAttach([sn], { all: true });
-      if (e.chT) sn.addModifier(new VF.Annotation(e.chT).setVerticalJustification(VF.Annotation.VerticalJustify.TOP).setFont('Arial', 13, 'bold'), 0);
-      e.sn = sn; return sn;
+  const H = 190, Y = 50, nB = piece.bars.length, chunks = [];
+  let X = 0, pend = null;
+  for (let s0 = 0; s0 < nB; s0 += CH_BARS) {
+    const s1 = Math.min(nB, s0 + CH_BARS), ci = chunks.length;
+    let w = 0; for (let i = s0; i < s1; i++) w += widths[i];
+    w += (s0 === 0 ? 10 : 0) + (s1 === nB ? 20 : 0);
+    const el = document.createElement('div'); el.className = 'chunk'; host.appendChild(el);
+    const renderer = new VF.Renderer(el, VF.Renderer.Backends.SVG); renderer.resize(w, H);
+    const c = renderer.getContext();
+    let x = s0 === 0 ? 10 : 0;
+    for (let i = s0; i < s1; i++) {
+      const bar = piece.bars[i], stave = new VF.Stave(x, Y, widths[i]);
+      if (i === 0) stave.addClef('treble').addKeySignature(piece.keyName).addTimeSignature(piece.meter);
+      if (i === nB - 1) stave.setEndBarType(VF.Barline.type.END);
+      stave.setContext(c).draw();
+      if (piece.marks && piece.marks[i]) { c.save(); c.setFont('Arial', 12, 'bold'); c.fillText(piece.marks[i], x + (i === 0 ? 2 : 8), 16); c.restore(); }
+      const notes = bar.map(e => {
+        const d = DUR[e.ticks];
+        const key = e.rest ? 'b/4' : LET[lt(e.dn)] + (e.acc === 1 ? '#' : e.acc === -1 ? 'b' : '') + '/' + Math.floor(e.dn / 7);
+        const sn = new VF.StaveNote({ keys: [key], duration: d + (e.rest ? 'r' : ''), auto_stem: true });
+        if (d.includes('d')) VF.Dot.buildAndAttach([sn], { all: true });
+        if (e.chT) sn.addModifier(new VF.Annotation(e.chT).setVerticalJustification(VF.Annotation.VerticalJustify.TOP).setFont('Arial', 13, 'bold'), 0);
+        e.sn = sn; e.ci = ci; return sn;
+      });
+      const tuplets = []; let grp = null, gt = null;
+      bar.forEach(e => { if (e.tup) { if (e.tup !== gt) { gt = e.tup; grp = []; tuplets.push(grp); } grp.push(e.sn); } else gt = null; });
+      const tups = tuplets.map(g => new VF.Tuplet(g, { num_notes: 3, notes_occupied: 2 }));
+      const beams = VF.Beam.generateBeams(notes, { groups: [new VF.Fraction(piece.compound ? 3 : 1, piece.compound ? 8 : 4)], beam_rests: false });
+      const voice = new VF.Voice({ num_beats: piece.compound ? 6 : piece.nb, beat_value: piece.compound ? 8 : 4 }).setMode(VF.Voice.Mode.SOFT).addTickables(notes);
+      VF.Accidental.applyAccidentals([voice], piece.keyName);
+      new VF.Formatter().joinVoices([voice]).formatToStave([voice], stave);
+      voice.draw(c, stave);
+      beams.forEach(b => b.setContext(c).draw());
+      tups.forEach(t => t.setContext(c).draw());
+      bar.forEach(e => { e.x = X + e.sn.getAbsoluteX() + 6; e.el = e.sn.getSVGElement ? e.sn.getSVGElement() : null; });
+      bar.endX = X + x + widths[i];
+      x += widths[i];
+    }
+    // liaisons (coupées en deux quand elles passent d'un bloc au suivant)
+    if (pend) { if (pend.sn && pend.ci === ci) new VF.StaveTie({ first_note: null, last_note: pend.sn, first_indices: [0], last_indices: [0] }).setContext(c).draw(); pend = null; }
+    for (let i = s0; i < s1; i++) piece.bars[i].forEach(e => {
+      if (!e.tie) return;
+      const nx = piece.flat[piece.flat.indexOf(e) + 1]; if (!nx || nx.rest) return;
+      if (nx.bar < s1) new VF.StaveTie({ first_note: e.sn, last_note: nx.sn, first_indices: [0], last_indices: [0] }).setContext(c).draw();
+      else { new VF.StaveTie({ first_note: e.sn, last_note: null, first_indices: [0], last_indices: [0] }).setContext(c).draw(); pend = nx; }
     });
-    const tuplets = []; let grp = null, gt = null;
-    bar.forEach(e => { if (e.tup) { if (e.tup !== gt) { gt = e.tup; grp = []; tuplets.push(grp); } grp.push(e.sn); } else gt = null; });
-    const tups = tuplets.map(g => new VF.Tuplet(g, { num_notes: 3, notes_occupied: 2 }));
-    const beams = VF.Beam.generateBeams(notes, { groups: [new VF.Fraction(piece.compound ? 3 : 1, piece.compound ? 8 : 4)], beam_rests: false });
-    const voice = new VF.Voice({ num_beats: piece.compound ? 6 : piece.nb, beat_value: piece.compound ? 8 : 4 }).setMode(VF.Voice.Mode.SOFT).addTickables(notes);
-    VF.Accidental.applyAccidentals([voice], piece.keyName);
-    new VF.Formatter().joinVoices([voice]).formatToStave([voice], stave);
-    voice.draw(c, stave);
-    beams.forEach(b => b.setContext(c).draw());
-    tups.forEach(t => t.setContext(c).draw());
-    bar.forEach(e => { e.x = e.sn.getAbsoluteX() + 6; e.el = e.sn.getSVGElement ? e.sn.getSVGElement() : null; });
-    bar.endX = x + widths[i];
-    x += widths[i];
-  });
-  piece.flat.forEach((e, i) => { if (e.tie && piece.flat[i + 1]) ties.push([e.sn, piece.flat[i + 1].sn]); });
-  ties.forEach(([a, b]) => new VF.StaveTie({ first_note: a, last_note: b, first_indices: [0], last_indices: [0] }).setContext(c).draw());
-  const svg = host.querySelector('svg');
-  svg.setAttribute('viewBox', `0 0 ${total} ${H}`);
-  const sc = o.fit ? Math.min(+S.size, ($('vp').clientWidth - 24) / total) : +S.size;
-  svg.style.width = total * sc + 'px'; svg.style.height = H * sc + 'px';
-  VIEW = { total, H, sc };
+    const svg = el.querySelector('svg'); svg.setAttribute('viewBox', `0 0 ${w} ${H}`);
+    chunks.push({ el, svg, x0: X, w });
+    X += w;
+  }
+  // la liaison en attente désigne une note du bloc suivant : on la dessine une fois ce bloc gravé
+  const total = X, sc = o.fit ? Math.min(+S.size, ($('vp').clientWidth - 24) / total) : +S.size;
+  chunks.forEach(ch => { ch.svg.style.width = ch.w * sc + 'px'; ch.svg.style.height = H * sc + 'px'; });
+  host.style.height = H * sc + 'px';
+  VIEW = { total, H, sc, chunks };
+  placeStrip(0);
   return true;
+}
+function placeStrip(off) {
+  if (!VIEW) return;
+  const vw = $('vp').clientWidth, sc = VIEW.sc;
+  VIEW.chunks.forEach(ch => {
+    const left = ch.x0 * sc + off, vis = left < vw + 300 && left + ch.w * sc > -300;
+    ch.el.style.display = vis ? '' : 'none';
+    if (vis) ch.el.style.transform = `translate3d(${left.toFixed(1)}px,0,0)`;
+  });
 }
 function color(e, col) { if (!e.el) return; e.el.querySelectorAll('*').forEach(n => { if (n.getAttribute('fill') !== 'none') n.setAttribute('fill', col); if (n.getAttribute('stroke') && n.getAttribute('stroke') !== 'none') n.setAttribute('stroke', col); }); }
 
@@ -522,25 +749,29 @@ function fillControls() {
 function tempoKey() { return S.style + S.level + (PIECE && PIECE.compound ? 'c' : ''); }
 function defaultTempo() { const t = TEMPI[S.style][S.level - 1]; return PIECE && PIECE.compound ? Math.round(t * .62 / 2) * 2 : t; }
 function curTempo() { return S.tempo[tempoKey()] || defaultTempo(); }
+function showDur() { const el = $('durTag'); if (!el || !PIECE) return; const sec = Math.round(PIECE.total / PIECE.beatT * 60 / curTempo()); el.textContent = '≈ ' + (sec >= 60 ? Math.floor(sec / 60) + ' min ' + String(sec % 60).padStart(2, '0') : sec + ' s'); }
 function showTempo() { const t = curTempo(); $('fTempo').value = t; $('tempoVal').textContent = t; $('tempoUnit').textContent = PIECE && PIECE.compound ? '(noire pointée)' : '(noire)'; }
 function newPiece() {
   stopRun();
-  S.style = $('fStyle').value; S.level = +$('fLevel').value; S.meter = $('fMeter').value; S.keyN = $('fKey').value; S.bars = +$('fBars').value; save();
-  PIECE = genPiece({ style: S.style, level: S.level, meter: S.meter, keyN: S.keyN, bars: S.bars, lo: +S.lo, hi: +S.hi });
+  S.style = $('fStyle').value; S.level = +$('fLevel').value; S.meter = $('fMeter').value; S.keyN = $('fKey').value; S.bars = isNaN(+$('fBars').value) ? $('fBars').value : +$('fBars').value; save();
+  const jz = isJazzStyle(S.style), go = { style: S.style, level: S.level, meter: S.meter, keyN: S.keyN, bars: S.bars, lo: +S.lo, hi: +S.hi };
+  $('fMeter').disabled = jz;
+  PIECE = jz ? genJazz(go) : typeof S.bars === 'string' ? genLongForm(go) : genPiece(go);
   if (!render(PIECE)) return;
   showTempo();
-  $('info').innerHTML = `<span class="tag">${STYLE_NAME[PIECE.style]} · niveau ${PIECE.level}</span><span class="tag plain">${PIECE.label}</span><span class="tag plain">${PIECE.meter}</span>${PIECE.swing ? '<span class="tag plain">croches ternaires (swing)</span>' : ''}<span class="tag plain">${PIECE.bars.length} mesures</span>`;
+  $('info').innerHTML = `<span class="tag">${STYLE_NAME[PIECE.style]} · niveau ${PIECE.level}</span><span class="tag plain">${PIECE.label}</span><span class="tag plain">${PIECE.meter}</span>${PIECE.swing ? '<span class="tag plain">croches ternaires (swing)</span>' : ''}<span class="tag plain">${PIECE.bars.length} mesures</span>${PIECE.desc ? `<span class="tag plain">${PIECE.desc}</span>` : ''}<span class="tag plain" id="durTag"></span>`;
+  showDur();
   $('result').classList.add('hidden');
   idleView(); setStatus('Prêt. Regarde l\'armure et la mesure, puis Départ.');
 }
 function idleView() {
   const vp = $('vp'); vp.classList.remove('review'); vp.scrollLeft = 0;
-  $('strip').style.transform = 'translate3d(0,0,0)';
+  $('strip').classList.remove('flow'); placeStrip(0);
   $('ph').classList.add('hidden'); $('mask').classList.add('hidden'); $('count').classList.add('hidden'); $('memo').classList.add('hidden');
 }
 function setStatus(h) { $('status').innerHTML = h; $('status2').innerHTML = h; }
 ['fStyle', 'fLevel', 'fMeter', 'fKey', 'fBars'].forEach(id => $(id).onchange = newPiece);
-$('fTempo').oninput = e => { S.tempo[tempoKey()] = +e.target.value; $('tempoVal').textContent = e.target.value; save(); };
+$('fTempo').oninput = e => { S.tempo[tempoKey()] = +e.target.value; $('tempoVal').textContent = e.target.value; save(); showDur(); };
 $('fLook').onchange = e => { S.look = +e.target.value; save(); };
 $('fMic').onchange = e => { S.mic = +e.target.value; save(); };
 $('fMetro').onchange = e => { S.metro = e.target.checked; save(); };
@@ -581,7 +812,7 @@ async function startRun(kind, o) {
   if (kind === 'hear') tl.notes.forEach(n => tone(bus, tS + n.on, Math.max(.06, (n.end - n.on) * .92), n.midi - transp()));
   const off = audioPerfOffset();
   Object.assign(RUN, { on: true, kind, o, piece, bus, tl, bpm, useMic: wantMic && !!mic, perfStart: tS * 1000 + off, nCount, ni: 0, prevW: null, sc: VIEW.sc });
-  const vp = $('vp'); vp.classList.remove('review'); vp.scrollLeft = 0;
+  const vp = $('vp'); vp.classList.remove('review'); vp.scrollLeft = 0; $('strip').classList.remove('flow');
   $('ph').classList.toggle('hidden', !!o.hide); $('memo').classList.toggle('hidden', !o.hide); $('result').classList.add('hidden');
   $('mask').classList.toggle('hidden', !!o.static || kind !== 'play' || +S.look === 0);
   syncButtons();
@@ -595,11 +826,11 @@ function frame() {
   const vp = $('vp'), sc = RUN.sc, x = xAt(tl, t);
   if (RUN.o.static) {
     const pad = staticPad();
-    $('strip').style.transform = `translate3d(${pad.toFixed(1)}px,0,0)`;
+    placeStrip(pad);
     $('ph').style.left = (pad + Math.max(tl.A[0][1] - 26, x) * sc - 1).toFixed(1) + 'px';
   } else {
     const phX = Math.round(vp.clientWidth * .22);
-    $('strip').style.transform = `translate3d(${(phX - x * sc).toFixed(1)}px,0,0)`;
+    placeStrip(phX - x * sc);
     $('ph').style.left = (phX - 1) + 'px';
     if (RUN.kind === 'play' && +S.look > 0) $('mask').style.width = Math.max(0, phX - 14 + (+S.look === 2 ? (xAt(tl, t + tl.beatSec) - x) * sc : 0)) + 'px';
   }
@@ -636,7 +867,7 @@ function stopRun() {
 }
 function reviewView() {
   const vp = $('vp'); $('ph').classList.add('hidden'); $('mask').classList.add('hidden');
-  $('strip').style.transform = 'none'; vp.classList.add('review'); vp.scrollLeft = 0;
+  $('strip').classList.add('flow'); vp.classList.add('review'); vp.scrollLeft = 0;
 }
 function finish() {
   const { kind, tl, useMic, o, bpm } = RUN;
@@ -866,7 +1097,7 @@ function jzHidden() { return +S.jz.show === 2 || (+S.jz.show === 1 && JZ.idx > 0
 function jzMemo(html) { const m = $('memo'); m.innerHTML = `<div>${html}</div>`; m.classList.remove('hidden'); }
 function jzIdle() {
   const vp = $('vp'); vp.classList.remove('review'); vp.scrollLeft = 0;
-  $('strip').style.transform = `translate3d(${staticPad().toFixed(1)}px,0,0)`;
+  $('strip').classList.remove('flow'); placeStrip(staticPad());
   $('ph').classList.add('hidden'); $('mask').classList.add('hidden'); $('count').classList.add('hidden'); $('memo').classList.add('hidden');
 }
 function jzMastKey() { return S.jz.type + ':' + JZ.item.id; }
