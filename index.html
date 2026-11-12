@@ -85,7 +85,6 @@ h1,h2,h3{margin:0}
 svg.staff{width:100%;height:auto;display:block;overflow:visible}
 svg .sl,svg path{fill:var(--ink)}
 svg .nh.ok{fill:var(--ok)} svg .nh.bad{fill:var(--bad)}
-
 .fb{text-align:center;font-weight:800;font-size:21px;pointer-events:none;min-height:30px;line-height:30px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px}
 .fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
 .fb small{font-size:14px;font-weight:600;color:var(--muted);margin-left:8px}
@@ -96,6 +95,9 @@ svg .nh.ok{fill:var(--ok)} svg .nh.bad{fill:var(--bad)}
 .nbtn:active{transform:scale(.96);background:var(--brass-l)}
 .nbtn.good{background:var(--ok);color:#fff;border-color:var(--ok)}
 .nbtn.badp{background:var(--bad);color:#fff;border-color:var(--bad)}
+.mods{display:flex;gap:8px;width:100%}
+.mods .nbtn{flex:1;width:auto;min-height:46px;font-size:17px}
+.nbtn.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
 .listen{display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px}
 .mic{width:56px;height:56px;border-radius:50%;background:#D9CDB8;display:grid;place-items:center;color:#fff;font-size:26px;flex:none}
 .mic.on{background:var(--brass);animation:pulse 1.5s infinite}
@@ -133,9 +135,10 @@ svg .nh.ok{fill:var(--ok)} svg .nh.bad{fill:var(--bad)}
 
 /* rhythm */
 .rhy-lines svg{margin:2px 0}
-svg .ev.ok path,svg .ev.ok rect{fill:var(--ok)}
-svg .ev.near path,svg .ev.near rect{fill:var(--near)}
-svg .ev.miss path,svg .ev.miss rect{fill:var(--bad)}
+svg .ev.ok path,svg .ev.ok rect,svg .ev.ok circle{fill:var(--ok)}
+svg .ev.near path,svg .ev.near rect,svg .ev.near circle{fill:var(--near)}
+svg .ev.miss path,svg .ev.miss rect,svg .ev.miss circle{fill:var(--bad)}
+svg circle,svg text.t3{fill:var(--ink)}
 svg .cursor{fill:var(--brass)}
 svg .mk.ok{fill:var(--ok)} svg .mk.near{fill:var(--near)} svg .mk.extra{fill:var(--bad)}
 .beats{display:flex;justify-content:center;gap:12px;margin:12px 0 4px}
@@ -157,6 +160,13 @@ svg .mk.ok{fill:var(--ok)} svg .mk.near{fill:var(--near)} svg .mk.extra{fill:var
 .advice{font-size:14.5px;margin:4px 0 10px;color:var(--ink)}
 .advice li{margin:3px 0}
 .progress-dots{letter-spacing:3px;color:var(--brass)}
+.ear-set{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0 12px}
+.ear-set span{background:var(--brass-l);color:var(--brass-d);font-weight:800;font-size:19px;border-radius:12px;padding:8px 14px}
+.ear-slots{display:flex;gap:8px;justify-content:center;margin:6px 0}
+.ear-slots i{font-style:normal;min-width:48px;height:48px;border-radius:12px;border:2px dashed var(--line2);display:grid;place-items:center;font-weight:800;font-size:13.5px;padding:0 5px;color:var(--muted)}
+.ear-slots i.ok{border:0;background:var(--ok);color:#fff}
+.ear-slots i.bad{border:0;background:var(--bad);color:#fff}
+.big .ic.emo{font-size:36px}
 .qn{height:1.1em;width:auto;vertical-align:-0.2em;overflow:visible}
 .qn path,.qn rect{fill:currentColor}
 
@@ -183,12 +193,22 @@ svg .mk.ok{fill:var(--ok)} svg .mk.near{fill:var(--near)} svg .mk.extra{fill:var
     </div>
     <button class="big" data-go="notes">
       <div class="ic" id="icNotes"></div>
-      <div><h2>Lire les notes</h2><p>Du Sol grave au Sol aigu</p><div class="prog" id="progNotes"></div></div>
+      <div><h2>Lire les notes</h2><p>Du Sol grave au Sol aigu, puis les dièses et les bémols</p><div class="prog" id="progNotes"></div></div>
       <span class="chev">›</span>
     </button>
     <button class="big" data-go="rythme">
       <div class="ic" id="icRhy"></div>
-      <div><h2>Le rythme</h2><p>Rondes, blanches, noires, croches et silences</p><div class="prog" id="progRhy"></div></div>
+      <div><h2>Le rythme</h2><p>Des rondes aux doubles croches, triolets et silences</p><div class="prog" id="progRhy"></div></div>
+      <span class="chev">›</span>
+    </button>
+    <button class="big" data-go="ecoute">
+      <div class="ic emo">👂</div>
+      <div><h2>Écoute et rejoue</h2><p>Une mélodie sans partition, à retrouver à l'oreille</p><div class="prog" id="progEar"></div></div>
+      <span class="chev">›</span>
+    </button>
+    <button class="big" data-go="suivi" style="padding:12px 16px">
+      <div class="ic emo" style="width:48px;height:48px;font-size:26px">📋</div>
+      <div><h2 style="font-size:17px">Suivi</h2><p>Le bilan du travail, à montrer ou à envoyer au professeur</p></div>
       <span class="chev">›</span>
     </button>
     <div class="tip">Chaque niveau a 3 vitesses : 🐢 → 🐇 → 🚀. Réussis une vitesse pour débloquer la suivante.</div>
@@ -283,6 +303,48 @@ svg .mk.ok{fill:var(--ok)} svg .mk.near{fill:var(--near)} svg .mk.extra{fill:var
     </div>
   </section>
 
+  <!-- EAR MENU -->
+  <section id="v-ear" class="view hidden">
+    <div class="lbl">Comment répondre ?</div>
+    <div class="seg" id="earModeSeg">
+      <button data-mode="play">🎺 Jouer</button>
+      <button data-mode="touch">👆 Toucher</button>
+    </div>
+    <p class="help" id="earModeHelp"></p>
+    <div class="lbl">Niveaux</div>
+    <div id="earLevels"></div>
+  </section>
+
+  <!-- EAR PLAY -->
+  <section id="v-ear-play" class="view hidden">
+    <div class="play-top">
+      <button class="pill" id="epQuit">✕ Arrêter</button>
+      <div class="mid" id="epTitle"></div>
+      <div class="right progress-dots" id="epDots"></div>
+    </div>
+    <div class="staff-card" style="padding:14px 10px">
+      <div class="small muted" style="text-align:center;font-weight:700">Tu vas entendre ces notes (dans le désordre)</div>
+      <div class="ear-set" id="epSet"></div>
+      <div class="ear-slots" id="epSlots"></div>
+      <div id="epStaff"></div>
+    </div>
+    <div class="rp-msg" id="epMsg"></div>
+    <div class="row" id="epActions">
+      <button class="btn ghost" id="epListen">▶︎ Écouter</button>
+      <button class="btn primary" id="epGo">🎺 À toi !</button>
+    </div>
+    <div id="epTouch" class="nbtns hidden" style="margin-top:12px"></div>
+    <div id="epMic" class="micpanel hidden">
+      <div style="font-weight:800">🎺 Je t'écoute… <span id="epHeard"></span></div>
+      <div class="meter"><i id="epMeter"></i></div>
+      <button class="linkbtn" id="epStopMic">Arrêter l'écoute</button>
+    </div>
+    <div id="epResult" class="hidden"></div>
+  </section>
+
+  <!-- SUIVI -->
+  <section id="v-suivi" class="view hidden"><div id="svBody"></div></section>
+
   <!-- SETTINGS -->
   <section id="v-settings" class="view hidden">
     <div class="card">
@@ -316,7 +378,7 @@ svg .mk.ok{fill:var(--ok)} svg .mk.near{fill:var(--near)} svg .mk.extra{fill:var
   </section>
 </div>
 
-<script>const GLYPHS = {"gClef":"M376 415l25 -145c3 -18 3 -18 29 -18c147 0 241 -113 241 -241c0 -113 -67 -198 -168 -238c-14 -6 -15 -5 -13 -17c11 -62 29 -157 29 -214c0 -170 -130 -200 -197 -200c-151 0 -190 98 -190 163c0 62 40 115 107 115c61 0 96 -47 96 -102c0 -58 -36 -85 -67 -94 c-23 -7 -32 -10 -32 -17c0 -13 26 -29 80 -29c59 0 159 18 159 166c0 47 -15 134 -27 201c-2 12 -4 11 -15 9c-20 -4 -46 -6 -69 -6c-245 0 -364 165 -364 339c0 202 153 345 297 464c12 10 11 12 9 24c-7 41 -14 106 -14 164c0 104 24 229 98 311c20 22 51 48 65 48 c11 0 37 -28 52 -50c41 -60 65 -146 65 -233c0 -153 -82 -280 -190 -381c-6 -6 -8 -7 -6 -19zM470 943c-61 0 -133 -96 -133 -252c0 -32 2 -66 6 -92c2 -13 6 -14 13 -8c79 69 174 159 174 270c0 55 -27 82 -60 82zM361 262l-21 128c-2 11 -4 12 -14 4 c-47 -38 -93 -75 -153 -142c-83 -94 -93 -173 -93 -232c0 -139 113 -236 288 -236c20 0 40 2 56 5c15 3 16 3 14 14l-50 298c-2 11 -4 12 -20 8c-61 -17 -100 -60 -100 -117c0 -46 30 -89 72 -107c7 -3 15 -6 15 -13c0 -6 -4 -11 -12 -11c-7 0 -19 3 -27 6 c-68 23 -115 87 -115 177c0 85 57 164 145 194c18 6 18 5 15 24zM430 103l49 -285c2 -12 4 -12 16 -6c56 28 94 79 94 142c0 88 -67 156 -148 163c-12 1 -13 -2 -11 -14z","whole":"M216 125c93 0 206 -52 206 -123c0 -70 -52 -127 -216 -127c-149 0 -206 60 -206 127c0 68 83 123 216 123zM111 63c-2 -8 -3 -16 -3 -24c0 -32 15 -66 35 -89c21 -28 58 -52 94 -52c10 0 21 1 31 4c33 8 46 36 46 67c0 60 -55 134 -124 134c-31 0 -68 -5 -79 -40z","half":"M97 -125c-55 0 -97 30 -97 83c0 52 47 167 196 167c58 0 99 -32 99 -83c0 -33 -33 -167 -198 -167zM75 -87c48 0 189 88 189 131c0 7 -3 13 -6 19c-7 12 -18 21 -37 21c-47 0 -192 -79 -192 -128c0 -7 3 -14 6 -20c7 -12 19 -23 40 -23z","black":"M97 -125c-54 0 -97 31 -97 83c0 86 88 167 198 167c57 0 97 -32 97 -83c0 -85 -109 -167 -198 -167z","rWhole":"M282 -109c0 -14 -12 -26 -26 -26h-230c-15 0 -26 12 -26 26v92c0 15 11 26 26 26h230c14 0 26 -11 26 -26v-92z","rHalf":"M282 24c0 -14 -12 -26 -26 -26h-230c-15 0 -26 12 -26 26v92c0 15 11 26 26 26h230c14 0 26 -11 26 -26v-92z","rQuarter":"M78 -38l-49 60s-10 10 -10 24c0 8 4 19 14 29c45 47 60 90 60 127c0 72 -57 123 -61 134c-3 6 -4 11 -4 16c0 14 10 21 20 21c6 0 13 -3 18 -8c17 -17 165 -193 165 -193s4 -9 4 -19c0 -5 -1 -10 -4 -15c-26 -41 -62 -89 -66 -147v-3l-1 -7v-3c0 -56 31 -93 69 -139 c11 -12 37 -45 37 -57c0 -3 -2 -4 -5 -4c-2 0 -4 0 -8 1l-1 1c-17 6 -50 17 -79 17c-42 0 -63 -32 -63 -73c0 -9 1 -18 4 -26c2 -9 13 -36 26 -36c8 -7 16 -15 16 -24c0 -2 -1 -4 -2 -7c-1 -4 -8 -6 -15 -6c-8 0 -18 3 -26 9c-73 56 -116 105 -116 155c0 49 34 96 86 96 l8 -3h4c4 -1 12 -3 16 -3c5 0 9 1 11 5c1 1 1 3 1 4c0 2 -4 10 -6 14c-13 21 -27 40 -43 60z","r8":"M134 107v-10c33 0 83 60 90 66c6 4 9 4 11 4c2 -1 12 -6 12 -16c-1 -5 -6 -21 -10 -39c0 0 -98 -351 -101 -353c-10 -8 -24 -10 -35 -10c-6 0 -29 1 -29 13c18 66 90 265 93 280c1 4 1 8 1 11c0 5 -1 9 -5 9c-1 0 -3 0 -5 -1c-13 -7 -22 -11 -36 -15 c-11 -4 -25 -7 -39 -7c-19 0 -38 6 -54 17c-15 12 -27 30 -27 51c0 37 30 67 67 67s67 -30 67 -67z","flag8Up":"M238 -790c-5 -17 -22 -23 -28 -19s-16 13 -16 29c0 4 1 9 3 15c17 45 24 92 24 137c0 59 -9 116 -24 150c-36 85 -131 221 -197 233v239c0 12 8 15 19 15c10 0 18 -6 21 -22c16 -96 58 -182 109 -261c63 -100 115 -218 115 -343c0 -78 -26 -173 -26 -173z","t4":"M362 -74h73c11 0 15 -7 15 -19s-5 -19 -15 -19h-73v-59c0 -32 21 -38 31 -38s22 -6 22 -20s-10 -21 -20 -21h-213c-15 0 -19 11 -19 21s7 19 23 19c18 0 40 8 40 35v63h-186c-12 0 -20 7 -20 17c0 3 1 7 3 12l1 1v1l6 8c30 42 128 181 128 305c0 16 14 19 23 19 c8 0 53 -2 71 -2s59 2 68 2c8 0 15 -6 15 -15l-1 -3c-3 -12 -163 -239 -243 -307h135v84c0 12 5 18 9 23l95 115c6 7 11 9 20 9c11 0 12 -9 12 -17v-214z","t3":"M213 248c42 -3 167 -30 167 -122c0 -46 -21 -72 -61 -91c-9 -5 -20 -6 -31 -9c-3 -1 -4 -5 -4 -9c0 -2 0 -3 1 -5c2 -4 5 -4 10 -5l33 -9l21 -12c10 -6 18 -13 24 -21c19 -22 26 -41 28 -70v-7c0 -88 -102 -139 -201 -139h-9c-98 2 -169 32 -171 110c0 22 5 46 22 61 c12 13 31 23 48 26c4 1 7 1 11 1c43 0 72 -30 72 -72c-1 -29 -23 -44 -23 -66v-5c1 -15 20 -15 28 -16c1 0 5 -1 9 -1c22 0 76 12 76 118c0 13 -9 91 -124 91c-8 0 -25 0 -25 12c0 11 14 16 24 17c63 3 122 32 122 106v7c0 24 -8 77 -93 77c-9 0 -40 -8 -42 -25v-4 c0 -14 15 -12 20 -14s30 -4 33 -41v-8c0 -33 -22 -65 -66 -65h-5c-62 4 -81 48 -81 81c0 53 86 110 172 110h4l7 -1h4z","t2":"M421 -91c-16 -155 -93 -159 -136 -159c-89 0 -104 54 -144 54c-59 0 -71 -61 -93 -61c-15 0 -26 21 -26 34l1 3c17 65 56 114 111 149c72 44 147 113 147 204c0 29 -1 96 -90 96c-59 0 -77 -24 -79 -38c0 -20 69 -23 69 -83c0 -25 -9 -88 -70 -88c-36 0 -67 24 -82 55 c-6 15 -9 29 -9 43c0 27 11 52 28 73c49 57 111 63 181 63c93 0 197 -46 197 -152c0 -83 -63 -112 -133 -131c-22 -6 -107 -36 -129 -72c11 4 24 6 37 6c41 0 88 -16 108 -24c10 -5 17 -6 30 -11c7 -2 12 -3 17 -3c21 0 29 19 39 44l1 1c2 7 5 11 13 11c7 0 12 -2 12 -14z ","sharp":"M237 118l-26 -10c-8 -3 -13 -22 -13 -29v-93c0 -12 7 -18 13 -18l26 10c2 1 3 1 5 1c4 0 7 -3 7 -8v-71c0 -6 -5 -14 -12 -17c0 0 -21 -8 -28 -11s-11 -15 -11 -23v-142c0 -6 -6 -11 -17 -11c-7 0 -13 5 -13 11v125c0 6 -5 18 -14 18l-2 -1h-1l-61 -25 c-5 -2 -10 -9 -10 -22v-139c0 -6 -7 -11 -17 -11c-7 0 -13 5 -13 11v123c0 5 -5 16 -12 16c-1 0 -2 0 -3 -1c-9 -3 -23 -9 -24 -9l-2 -1c-6 0 -9 3 -9 9v71c0 6 5 14 12 16c0 0 21 9 27 11c6 3 11 12 11 23v99c0 8 -6 18 -14 18l-1 -1c-8 -4 -23 -10 -24 -10l-2 -1 c-6 0 -9 3 -9 9v71c0 6 5 14 12 16c0 0 20 8 26 11s12 13 12 27v135c0 6 6 11 16 11c7 0 14 -5 14 -11v-120c0 -8 3 -20 12 -20c17 4 51 18 63 25c9 6 12 19 13 29v130c0 6 6 11 16 11c8 0 14 -5 14 -11v-122c0 -8 7 -13 14 -13c5 1 25 9 25 9c2 1 3 1 5 1c4 0 7 -3 7 -8 v-71c0 -6 -5 -14 -12 -17zM168 -45c2 9 4 37 4 64s-2 52 -4 57c-2 4 -8 6 -15 6c-25 0 -71 -21 -73 -38c-2 -8 -3 -43 -3 -74c0 -24 1 -46 3 -50c1 -3 6 -5 12 -5c23 0 70 20 76 40z","flat":"M12 -170c-8 10 -12 581 -12 581c1 18 17 28 31 28c10 0 19 -6 19 -17c0 -20 -6 -260 -7 -282c0 -7 4 -14 11 -17c2 -1 3 -1 5 -1c5 0 16 9 22 14c14 9 38 17 55 17c46 -3 90 -39 90 -96c0 -46 -31 -107 -120 -169c-25 -17 -49 -44 -79 -61c0 0 -3 -2 -6 -2s-6 1 -9 5z M47 -81c0 -5 2 -15 11 -15c3 0 6 1 10 3c43 27 89 81 89 135c0 25 -12 58 -41 58c-23 0 -63 -29 -70 -49c-1 -4 -2 -16 -2 -32c0 -40 3 -100 3 -100z"};</script>
+<script>const GLYPHS = {"gClef":"M376 415l25 -145c3 -18 3 -18 29 -18c147 0 241 -113 241 -241c0 -113 -67 -198 -168 -238c-14 -6 -15 -5 -13 -17c11 -62 29 -157 29 -214c0 -170 -130 -200 -197 -200c-151 0 -190 98 -190 163c0 62 40 115 107 115c61 0 96 -47 96 -102c0 -58 -36 -85 -67 -94 c-23 -7 -32 -10 -32 -17c0 -13 26 -29 80 -29c59 0 159 18 159 166c0 47 -15 134 -27 201c-2 12 -4 11 -15 9c-20 -4 -46 -6 -69 -6c-245 0 -364 165 -364 339c0 202 153 345 297 464c12 10 11 12 9 24c-7 41 -14 106 -14 164c0 104 24 229 98 311c20 22 51 48 65 48 c11 0 37 -28 52 -50c41 -60 65 -146 65 -233c0 -153 -82 -280 -190 -381c-6 -6 -8 -7 -6 -19zM470 943c-61 0 -133 -96 -133 -252c0 -32 2 -66 6 -92c2 -13 6 -14 13 -8c79 69 174 159 174 270c0 55 -27 82 -60 82zM361 262l-21 128c-2 11 -4 12 -14 4 c-47 -38 -93 -75 -153 -142c-83 -94 -93 -173 -93 -232c0 -139 113 -236 288 -236c20 0 40 2 56 5c15 3 16 3 14 14l-50 298c-2 11 -4 12 -20 8c-61 -17 -100 -60 -100 -117c0 -46 30 -89 72 -107c7 -3 15 -6 15 -13c0 -6 -4 -11 -12 -11c-7 0 -19 3 -27 6 c-68 23 -115 87 -115 177c0 85 57 164 145 194c18 6 18 5 15 24zM430 103l49 -285c2 -12 4 -12 16 -6c56 28 94 79 94 142c0 88 -67 156 -148 163c-12 1 -13 -2 -11 -14z","whole":"M216 125c93 0 206 -52 206 -123c0 -70 -52 -127 -216 -127c-149 0 -206 60 -206 127c0 68 83 123 216 123zM111 63c-2 -8 -3 -16 -3 -24c0 -32 15 -66 35 -89c21 -28 58 -52 94 -52c10 0 21 1 31 4c33 8 46 36 46 67c0 60 -55 134 -124 134c-31 0 -68 -5 -79 -40z","half":"M97 -125c-55 0 -97 30 -97 83c0 52 47 167 196 167c58 0 99 -32 99 -83c0 -33 -33 -167 -198 -167zM75 -87c48 0 189 88 189 131c0 7 -3 13 -6 19c-7 12 -18 21 -37 21c-47 0 -192 -79 -192 -128c0 -7 3 -14 6 -20c7 -12 19 -23 40 -23z","black":"M97 -125c-54 0 -97 31 -97 83c0 86 88 167 198 167c57 0 97 -32 97 -83c0 -85 -109 -167 -198 -167z","rWhole":"M282 -109c0 -14 -12 -26 -26 -26h-230c-15 0 -26 12 -26 26v92c0 15 11 26 26 26h230c14 0 26 -11 26 -26v-92z","rHalf":"M282 24c0 -14 -12 -26 -26 -26h-230c-15 0 -26 12 -26 26v92c0 15 11 26 26 26h230c14 0 26 -11 26 -26v-92z","rQuarter":"M78 -38l-49 60s-10 10 -10 24c0 8 4 19 14 29c45 47 60 90 60 127c0 72 -57 123 -61 134c-3 6 -4 11 -4 16c0 14 10 21 20 21c6 0 13 -3 18 -8c17 -17 165 -193 165 -193s4 -9 4 -19c0 -5 -1 -10 -4 -15c-26 -41 -62 -89 -66 -147v-3l-1 -7v-3c0 -56 31 -93 69 -139 c11 -12 37 -45 37 -57c0 -3 -2 -4 -5 -4c-2 0 -4 0 -8 1l-1 1c-17 6 -50 17 -79 17c-42 0 -63 -32 -63 -73c0 -9 1 -18 4 -26c2 -9 13 -36 26 -36c8 -7 16 -15 16 -24c0 -2 -1 -4 -2 -7c-1 -4 -8 -6 -15 -6c-8 0 -18 3 -26 9c-73 56 -116 105 -116 155c0 49 34 96 86 96 l8 -3h4c4 -1 12 -3 16 -3c5 0 9 1 11 5c1 1 1 3 1 4c0 2 -4 10 -6 14c-13 21 -27 40 -43 60z","r8":"M134 107v-10c33 0 83 60 90 66c6 4 9 4 11 4c2 -1 12 -6 12 -16c-1 -5 -6 -21 -10 -39c0 0 -98 -351 -101 -353c-10 -8 -24 -10 -35 -10c-6 0 -29 1 -29 13c18 66 90 265 93 280c1 4 1 8 1 11c0 5 -1 9 -5 9c-1 0 -3 0 -5 -1c-13 -7 -22 -11 -36 -15 c-11 -4 -25 -7 -39 -7c-19 0 -38 6 -54 17c-15 12 -27 30 -27 51c0 37 30 67 67 67s67 -30 67 -67z","flag8Up":"M238 -790c-5 -17 -22 -23 -28 -19s-16 13 -16 29c0 4 1 9 3 15c17 45 24 92 24 137c0 59 -9 116 -24 150c-36 85 -131 221 -197 233v239c0 12 8 15 19 15c10 0 18 -6 21 -22c16 -96 58 -182 109 -261c63 -100 115 -218 115 -343c0 -78 -26 -173 -26 -173z","t4":"M362 -74h73c11 0 15 -7 15 -19s-5 -19 -15 -19h-73v-59c0 -32 21 -38 31 -38s22 -6 22 -20s-10 -21 -20 -21h-213c-15 0 -19 11 -19 21s7 19 23 19c18 0 40 8 40 35v63h-186c-12 0 -20 7 -20 17c0 3 1 7 3 12l1 1v1l6 8c30 42 128 181 128 305c0 16 14 19 23 19 c8 0 53 -2 71 -2s59 2 68 2c8 0 15 -6 15 -15l-1 -3c-3 -12 -163 -239 -243 -307h135v84c0 12 5 18 9 23l95 115c6 7 11 9 20 9c11 0 12 -9 12 -17v-214z","t3":"M213 248c42 -3 167 -30 167 -122c0 -46 -21 -72 -61 -91c-9 -5 -20 -6 -31 -9c-3 -1 -4 -5 -4 -9c0 -2 0 -3 1 -5c2 -4 5 -4 10 -5l33 -9l21 -12c10 -6 18 -13 24 -21c19 -22 26 -41 28 -70v-7c0 -88 -102 -139 -201 -139h-9c-98 2 -169 32 -171 110c0 22 5 46 22 61 c12 13 31 23 48 26c4 1 7 1 11 1c43 0 72 -30 72 -72c-1 -29 -23 -44 -23 -66v-5c1 -15 20 -15 28 -16c1 0 5 -1 9 -1c22 0 76 12 76 118c0 13 -9 91 -124 91c-8 0 -25 0 -25 12c0 11 14 16 24 17c63 3 122 32 122 106v7c0 24 -8 77 -93 77c-9 0 -40 -8 -42 -25v-4 c0 -14 15 -12 20 -14s30 -4 33 -41v-8c0 -33 -22 -65 -66 -65h-5c-62 4 -81 48 -81 81c0 53 86 110 172 110h4l7 -1h4z","t2":"M421 -91c-16 -155 -93 -159 -136 -159c-89 0 -104 54 -144 54c-59 0 -71 -61 -93 -61c-15 0 -26 21 -26 34l1 3c17 65 56 114 111 149c72 44 147 113 147 204c0 29 -1 96 -90 96c-59 0 -77 -24 -79 -38c0 -20 69 -23 69 -83c0 -25 -9 -88 -70 -88c-36 0 -67 24 -82 55 c-6 15 -9 29 -9 43c0 27 11 52 28 73c49 57 111 63 181 63c93 0 197 -46 197 -152c0 -83 -63 -112 -133 -131c-22 -6 -107 -36 -129 -72c11 4 24 6 37 6c41 0 88 -16 108 -24c10 -5 17 -6 30 -11c7 -2 12 -3 17 -3c21 0 29 19 39 44l1 1c2 7 5 11 13 11c7 0 12 -2 12 -14z ","sharp":"M237 118l-26 -10c-8 -3 -13 -22 -13 -29v-93c0 -12 7 -18 13 -18l26 10c2 1 3 1 5 1c4 0 7 -3 7 -8v-71c0 -6 -5 -14 -12 -17c0 0 -21 -8 -28 -11s-11 -15 -11 -23v-142c0 -6 -6 -11 -17 -11c-7 0 -13 5 -13 11v125c0 6 -5 18 -14 18l-2 -1h-1l-61 -25 c-5 -2 -10 -9 -10 -22v-139c0 -6 -7 -11 -17 -11c-7 0 -13 5 -13 11v123c0 5 -5 16 -12 16c-1 0 -2 0 -3 -1c-9 -3 -23 -9 -24 -9l-2 -1c-6 0 -9 3 -9 9v71c0 6 5 14 12 16c0 0 21 9 27 11c6 3 11 12 11 23v99c0 8 -6 18 -14 18l-1 -1c-8 -4 -23 -10 -24 -10l-2 -1 c-6 0 -9 3 -9 9v71c0 6 5 14 12 16c0 0 20 8 26 11s12 13 12 27v135c0 6 6 11 16 11c7 0 14 -5 14 -11v-120c0 -8 3 -20 12 -20c17 4 51 18 63 25c9 6 12 19 13 29v130c0 6 6 11 16 11c8 0 14 -5 14 -11v-122c0 -8 7 -13 14 -13c5 1 25 9 25 9c2 1 3 1 5 1c4 0 7 -3 7 -8 v-71c0 -6 -5 -14 -12 -17zM168 -45c2 9 4 37 4 64s-2 52 -4 57c-2 4 -8 6 -15 6c-25 0 -71 -21 -73 -38c-2 -8 -3 -43 -3 -74c0 -24 1 -46 3 -50c1 -3 6 -5 12 -5c23 0 70 20 76 40z","flat":"M12 -170c-8 10 -12 581 -12 581c1 18 17 28 31 28c10 0 19 -6 19 -17c0 -20 -6 -260 -7 -282c0 -7 4 -14 11 -17c2 -1 3 -1 5 -1c5 0 16 9 22 14c14 9 38 17 55 17c46 -3 90 -39 90 -96c0 -46 -31 -107 -120 -169c-25 -17 -49 -44 -79 -61c0 0 -3 -2 -6 -2s-6 1 -9 5z M47 -81c0 -5 2 -15 11 -15c3 0 6 1 10 3c43 27 89 81 89 135c0 25 -12 58 -41 58c-23 0 -63 -29 -70 -49c-1 -4 -2 -16 -2 -32c0 -40 3 -100 3 -100z","flag16Up":"M272 -796c-6 -13 -13 -17 -20 -17c-14 0 -22 13 -22 26c0 3 0 5 1 9c5 30 8 60 8 89c0 52 -9 101 -32 149c-69 140 -140 142 -202 144h-5v388c0 7 11 10 17 10s18 -2 20 -13c17 -106 73 -122 127 -180c72 -78 98 -106 108 -174c2 -12 3 -23 3 -36 c0 -61 -22 -121 -25 -127c-1 -3 -1 -5 -1 -7c0 -4 1 -6 1 -9c18 -37 29 -78 29 -120v-22c0 -48 -3 -105 -7 -110zM209 -459c2 -3 4 -4 7 -4c5 0 12 3 13 6c5 8 5 18 7 26c1 7 1 13 1 20c0 32 -9 63 -27 89c-33 49 -87 105 -148 105h-8c-8 0 -14 -6 -14 -10c0 -1 0 -2 1 -3 c21 -82 67 -106 114 -160c21 -24 38 -44 54 -69z","r16":"M208 111v-10c34 1 84 61 91 67c3 2 6 4 11 4c2 -1 10 -5 10 -11c0 -1 -1 -2 -1 -4c-2 -13 -27 -101 -27 -101s-19 -67 -45 -152l-116 -381c-4 -11 -9 -23 -38 -23c-22 0 -31 10 -31 19l1 1v1l95 283v1l1 1c0 4 -2 6 -4 6c-23 -12 -49 -21 -75 -21c-38 0 -80 27 -80 68 c0 38 30 68 68 68c37 0 68 -30 68 -68c0 -3 0 -6 -1 -10c14 0 41 12 49 31c7 15 58 164 58 180c0 5 -2 7 -5 7c-2 0 -4 -1 -7 -2c-23 -13 -51 -22 -78 -22c-38 0 -80 27 -80 68c0 38 31 68 68 68c38 0 68 -30 68 -68z","natural":"M141 181l15 5c1 1 3 1 4 1c4 0 8 -3 8 -8v-502c0 -7 -6 -12 -12 -12h-13c-7 0 -12 5 -12 12v149c0 8 -7 11 -17 11c-29 0 -85 -24 -99 -30c-1 -1 -3 -1 -4 -1l-2 -1c-6 0 -9 3 -9 9v515c0 7 5 12 12 12h13c6 0 12 -5 12 -12v-167c0 -4 4 -5 10 -5c26 0 90 23 90 23 c1 0 2 1 4 1zM37 39v-103c0 -4 5 -6 12 -6c25 0 82 23 82 41v103c0 4 -3 5 -9 5c-24 0 -85 -26 -85 -40z"};</script>
 <script>
 'use strict';
 /* =========================================================
@@ -324,9 +386,11 @@ svg .mk.ok{fill:var(--ok)} svg .mk.near{fill:var(--near)} svg .mk.extra{fill:var
    ========================================================= */
 const STORE_KEY = 'solfegeTrompette.v1';
 const DEFAULT_STATE = {
-  settings: { instrument: 'bb', tapOffset: 0, micLat: null, teacher: false, noteMode: 'touch', rhythmMode: 'tap', metro: true },
+  settings: { instrument: 'bb', tapOffset: 0, micLat: null, teacher: false, noteMode: 'touch', rhythmMode: 'tap', metro: true, earMode: 'play' },
   notes: { unlocked: 0, best: {}, stats: {} },
-  rhythm: { unlocked: 0, wins: {}, best: {} }
+  rhythm: { unlocked: 0, wins: {}, best: {} },
+  ear: { unlocked: 0, wins: {} },
+  log: []
 };
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function merge(a, b) {
@@ -341,6 +405,7 @@ function load() {
   return clone(DEFAULT_STATE);
 }
 let S = load();
+function logPush(e) { e.d = Date.now(); S.log.push(e); if (S.log.length > 300) S.log = S.log.slice(-300); }
 function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) {} }
 
 /* =========================================================
@@ -363,10 +428,13 @@ const LETTERS = ['Do', 'Ré', 'Mi', 'Fa', 'Sol', 'La', 'Si'];
 const PCS = [0, 2, 4, 5, 7, 9, 11];
 const CHROMA = ['Do', 'Do♯', 'Ré', 'Mi♭', 'Mi', 'Fa', 'Fa♯', 'Sol', 'Sol♯', 'La', 'Si♭', 'Si'];
 function dnOf(s) { return (+s.slice(1)) * 7 + 'CDEFGAB'.indexOf(s[0]); }
-function noteFromDn(dn) {
+function noteFromDn(dn, acc) {
+  acc = acc || 0;
   const oct = Math.floor(dn / 7), l = dn - oct * 7;
-  return { dn, pos: dn - 30, name: LETTERS[l], letter: l, oct, midi: 12 * (oct + 1) + PCS[l] };
+  return { dn, acc, key: dn + (acc > 0 ? '#' : acc < 0 ? 'b' : ''), pos: dn - 30, base: LETTERS[l], name: LETTERS[l] + (acc > 0 ? '♯' : acc < 0 ? '♭' : ''), letter: l, oct, midi: 12 * (oct + 1) + PCS[l] + acc };
 }
+function nt(s) { return noteFromDn(dnOf(s[0] + s.slice(-1)), s.length === 3 ? (s[1] === '#' ? 1 : -1) : 0); }
+function noteFromKey(k) { const m = /^(\d+)([#b]?)$/.exec(k); return m ? noteFromDn(+m[1], m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0) : null; }
 function chromaName(m) { return CHROMA[((m % 12) + 12) % 12]; }
 function transp() { return S.settings.instrument === 'bb' ? 2 : 0; } // écrit = réel + 2 pour Si♭
 function placeName(n) {
@@ -403,16 +471,17 @@ function staffSVG(opt) {
     const hw = 1.69 * Sp, ext = 0.4 * Sp, th = 0.16 * Sp;
     for (let p = -2; p >= n.pos; p -= 2) s += rect(n.x - ext, y(p) - th / 2, hw + 2 * ext, th, 'sl');
     for (let p = 10; p <= n.pos; p += 2) s += rect(n.x - ext, y(p) - th / 2, hw + 2 * ext, th, 'sl');
+    if (n.acc) s += glyph(n.acc > 0 ? 'sharp' : 'flat', n.x - (n.acc > 0 ? 1.3 : 1.2) * Sp, y(n.pos), Sp, 'nh ' + (n.cls || ''));
     s += glyph('whole', n.x, y(n.pos), Sp, 'nh ' + (n.cls || ''));
   }
   return s + '</svg>';
 }
 function bigStaff(note, cls) {
-  return staffSVG({ S: 16, W: 260, H: 146, yTop: 28, clefX: 14, notes: note ? [{ pos: note.pos, x: 150, cls }] : [], label: note ? 'note à lire' : 'portée vide' });
+  return staffSVG({ S: 16, W: 260, H: 146, yTop: 28, clefX: 14, notes: note ? [{ pos: note.pos, acc: note.acc, x: 150, cls }] : [], label: note ? 'note à lire' : 'portée vide' });
 }
-function miniStaff(notes) { // notes: [pos...]
-  const xs = notes.length === 1 ? [40] : [34, 60];
-  return staffSVG({ S: 6, W: 84, H: 56, yTop: 11, clefX: 4, notes: notes.map((p, i) => ({ pos: p, x: xs[i] })) });
+function miniStaff(notes) { // notes: objets note
+  const xs = notes.length === 1 ? [40] : [36, 62];
+  return staffSVG({ S: 6, W: 84, H: 56, yTop: 11, clefX: 4, notes: notes.map((n, i) => ({ pos: n.pos, acc: n.acc, x: xs[i] })) });
 }
 
 /* =========================================================
@@ -512,8 +581,8 @@ function yin(buf, sr) {
    Navigation
    ========================================================= */
 const $ = id => document.getElementById(id);
-const VIEWS = ['home', 'notes', 'notes-play', 'notes-result', 'rhythm', 'rhythm-play', 'settings'];
-const TITLES = { home: 'Solfège Trompette', notes: 'Lire les notes', 'notes-play': 'Lire les notes', 'notes-result': 'Bilan', rhythm: 'Le rythme', 'rhythm-play': 'Le rythme', settings: 'Réglages' };
+const VIEWS = ['home', 'notes', 'notes-play', 'notes-result', 'rhythm', 'rhythm-play', 'ear', 'ear-play', 'suivi', 'settings'];
+const TITLES = { home: 'Solfège Trompette', notes: 'Lire les notes', 'notes-play': 'Lire les notes', 'notes-result': 'Bilan', rhythm: 'Le rythme', 'rhythm-play': 'Le rythme', settings: 'Réglages', ear: 'Écoute et rejoue', 'ear-play': 'Écoute et rejoue', suivi: 'Suivi' };
 let current = 'home';
 function show(v) {
   current = v;
@@ -523,12 +592,14 @@ function show(v) {
   $('btnSettings').classList.toggle('inv', v !== 'home');
   window.scrollTo(0, 0);
 }
-function stopAll() { ngStop(); rgStop(); calStop(); closeMic(); }
+function stopAll() { ngStop(); rgStop(); calStop(); egStop(); closeMic(); }
 function route() {
   stopAll();
   const h = (location.hash || '').slice(1);
   if (h === 'notes') { renderNotesMenu(); show('notes'); }
   else if (h === 'rythme') { renderRhythmMenu(); show('rhythm'); }
+  else if (h === 'ecoute') { renderEarMenu(); show('ear'); }
+  else if (h === 'suivi') { renderSuivi(); show('suivi'); }
   else if (h === 'reglages') { renderSettings(); show('settings'); }
   else { renderHome(); show('home'); }
 }
@@ -537,6 +608,7 @@ window.addEventListener('hashchange', route);
 $('btnBack').onclick = () => {
   if (current === 'notes-play' || current === 'notes-result') { stopAll(); renderNotesMenu(); show('notes'); }
   else if (current === 'rhythm-play') { stopAll(); renderRhythmMenu(); show('rhythm'); }
+  else if (current === 'ear-play') { stopAll(); renderEarMenu(); show('ear'); }
   else go('home');
 };
 $('btnSettings').onclick = () => go('reglages');
@@ -565,6 +637,7 @@ function renderHome() {
   const nu = S.notes.unlocked, ru = S.rhythm.unlocked;
   $('progNotes').textContent = progressText(nu, NOTE_LEVELS.length);
   $('progRhy').textContent = progressText(ru, RHY_LEVELS.length);
+  $('progEar').textContent = S.ear.unlocked >= EAR_LEVELS.length ? '🏆 Tous les niveaux réussis' : `En cours : niveau ${S.ear.unlocked + 1}`;
 }
 function progressText(u, nLv) {
   const max = nLv * 3;
@@ -592,7 +665,13 @@ const NOTE_LEVELS = [
   { name: "Jusqu'au Do aigu", sub: 'Do grave → Do (3e interligne)', from: 'C4', to: 'C5' },
   { name: 'Les notes graves', sub: 'Sol grave → Do aigu', from: 'G3', to: 'C5' },
   { name: "Jusqu'au Mi aigu", sub: 'Sol grave → Mi (5e ligne)', from: 'G3', to: 'E5' },
-  { name: 'Toute la tessiture', sub: 'Sol grave → Sol aigu', from: 'G3', to: 'G5' }
+  { name: 'Toute la tessiture', sub: 'Sol grave → Sol aigu', from: 'G3', to: 'G5' },
+  { name: 'Fa♯ et Si♭', sub: 'Les deux altérations les plus courantes', from: 'C4', to: 'D5', alt: ['F#4', 'Bb4', 'Bb3', 'F#5'], show: ['F#4', 'Bb4'] },
+  { name: 'Do♯ et Mi♭', sub: 'Avec Fa♯ et Si♭', from: 'G3', to: 'E5', alt: ['F#4', 'Bb4', 'Bb3', 'F#5', 'C#4', 'C#5', 'Eb4', 'Eb5'], show: ['C#5', 'Eb4'] },
+  { name: 'Sol♯ et La♭', sub: 'Avec les précédentes', from: 'G3', to: 'G5', alt: ['F#4', 'Bb4', 'Bb3', 'F#5', 'C#4', 'C#5', 'Eb4', 'Eb5', 'G#4', 'Ab4', 'G#3', 'Ab3'], show: ['G#4', 'Ab4'] },
+  { name: 'Tous les dièses', sub: 'Do♯ Ré♯ Fa♯ Sol♯ La♯', from: 'G3', to: 'G5', alt: ['G#3', 'A#3', 'C#4', 'D#4', 'F#4', 'G#4', 'A#4', 'C#5', 'D#5', 'F#5'], show: ['D#4', 'A#4'] },
+  { name: 'Tous les bémols', sub: 'Ré♭ Mi♭ Sol♭ La♭ Si♭', from: 'G3', to: 'G5', alt: ['Ab3', 'Bb3', 'Db4', 'Eb4', 'Gb4', 'Ab4', 'Bb4', 'Db5', 'Eb5', 'Gb5'], show: ['Db5', 'Gb4'] },
+  { name: 'Toutes les altérations', sub: 'Dièses et bémols, Sol grave → Sol aigu', from: 'G3', to: 'G5', alt: ['G#3', 'A#3', 'C#4', 'D#4', 'F#4', 'G#4', 'A#4', 'C#5', 'D#5', 'F#5', 'Ab3', 'Bb3', 'Db4', 'Eb4', 'Gb4', 'Ab4', 'Bb4', 'Db5', 'Eb5', 'Gb5'], show: ['G#4', 'Db5'] }
 ];
 const MODE_BONUS = { touch: 0, voice: 1, play: 1.5 };
 const N_QUESTIONS = 20, PASS = 16;
@@ -626,7 +705,7 @@ function renderNotesMenu() {
     const locked = li * 3 > un;
     d.className = 'level' + (locked ? ' locked' : '');
     const lo = noteFromDn(dnOf(lv.from)), hi = noteFromDn(dnOf(lv.to));
-    d.innerHTML = `<div class="lv-head"><div class="lv-num">${locked ? '🔒' : li + 1}</div><div><div class="lv-name">${lv.name}</div><div class="lv-sub">${lv.sub}</div></div><div class="lv-mini">${miniStaff([lo.pos, hi.pos])}</div></div><div class="speeds"></div>`;
+    d.innerHTML = `<div class="lv-head"><div class="lv-num">${locked ? '🔒' : li + 1}</div><div><div class="lv-name">${lv.name}</div><div class="lv-sub">${lv.sub}</div></div><div class="lv-mini">${miniStaff(lv.show ? lv.show.map(nt) : [lo, hi])}</div></div><div class="speeds"></div>`;
     const sp = d.querySelector('.speeds');
     SPEEDS.forEach((s, si) => {
       const idx = li * 3 + si, b = document.createElement('button');
@@ -647,8 +726,9 @@ function ngPrepare(li, si) {
   if (mode === 'voice' && !CAN_VOICE) { flash($('noteModeHelp')); return; }
   if (mode === 'play' && !CAN_MIC) { flash($('noteModeHelp')); return; }
   const lv = NOTE_LEVELS[li];
-  Object.assign(NG, { running: false, level: li, speed: si, mode, limit: SPEEDS[si].limit + MODE_BONUS[mode], i: 0, correct: 0, streak: 0, bestStreak: 0, results: [], miss: {}, seen: {}, prevDn: null, cur: null });
+  Object.assign(NG, { running: false, level: li, speed: si, mode, limit: SPEEDS[si].limit + MODE_BONUS[mode] + (lv.alt ? 1 : 0), acc: !!lv.alt, mod: 0, i: 0, correct: 0, streak: 0, bestStreak: 0, results: [], miss: {}, seen: {}, prevDn: null, cur: null });
   NG.pool = []; for (let dn = dnOf(lv.from); dn <= dnOf(lv.to); dn++) NG.pool.push(noteFromDn(dn));
+  if (lv.alt) lv.alt.forEach(a => NG.pool.push(nt(a)));
   $('npStaff').innerHTML = bigStaff(null);
   $('npFb').textContent = ''; $('npFb').className = 'fb';
   $('npCount').textContent = `Niveau ${li + 1} · ${SPEEDS[si].icon}`;
@@ -657,8 +737,8 @@ function ngPrepare(li, si) {
   $('npReady').classList.remove('hidden');
   ['npTouch', 'npVoice', 'npPlay'].forEach(id => $(id).classList.add('hidden'));
   $('npReadyTitle').textContent = `${N_QUESTIONS} notes · ${SPEEDS[si].icon} ${String(NG.limit).replace('.', ',')} s par note`;
-  $('npReadyText').textContent = mode === 'touch' ? 'Touche le nom de chaque note le plus vite possible.'
-    : mode === 'voice' ? 'Dis le nom de chaque note à voix haute, bien clairement (do, ré, mi…). Une seule note à la fois.'
+  $('npReadyText').textContent = mode === 'touch' ? (lv.alt ? 'Pour une note altérée, touche d\'abord ♭ ou ♯, puis le nom de la note.' : 'Touche le nom de chaque note le plus vite possible.')
+    : mode === 'voice' ? (lv.alt ? 'Dis le nom complet : « fa dièse », « si bémol », ou simplement « sol ».' : 'Dis le nom de chaque note à voix haute, bien clairement (do, ré, mi…). Une seule note à la fois.')
     : 'Joue chaque note à la trompette. Tiens-la une petite seconde : le téléphone vérifie la note et l\'octave.';
   show('notes-play');
 }
@@ -681,17 +761,26 @@ $('npQuit').onclick = () => { stopAll(); renderNotesMenu(); show('notes'); };
 
 function buildNoteButtons() {
   const box = $('npTouch'); box.innerHTML = ''; box.classList.remove('hidden');
+  if (NG.acc) {
+    const row = document.createElement('div'); row.className = 'mods';
+    [[-1, '♭ bémol'], [1, '♯ dièse']].forEach(([m, label]) => {
+      const b = document.createElement('button'); b.className = 'nbtn mod'; b.textContent = label; b.dataset.m = m;
+      b.addEventListener('pointerdown', e => { e.preventDefault(); NG.mod = NG.mod === m ? 0 : m; row.querySelectorAll('.mod').forEach(x => x.classList.toggle('sel', +x.dataset.m === NG.mod)); });
+      row.appendChild(b);
+    });
+    box.appendChild(row);
+  }
   LETTERS.forEach(n => {
     const b = document.createElement('button'); b.className = 'nbtn'; b.textContent = n; b.dataset.n = n;
-    b.addEventListener('pointerdown', e => { e.preventDefault(); ngAnswer(n, b); });
+    b.addEventListener('pointerdown', e => { e.preventDefault(); ngAnswer(n + (NG.mod > 0 ? '♯' : NG.mod < 0 ? '♭' : ''), b); });
     box.appendChild(b);
   });
 }
 function pickNote() {
-  const pool = NG.pool.filter(n => n.dn !== NG.prevDn);
+  const pool = NG.pool.filter(n => n.key !== NG.prevDn);
   const w = pool.map(n => {
-    const st = S.notes.stats[n.dn]; const rate = st && st.n >= 3 ? st.err / st.n : 0.15;
-    return 1 + 3 * rate + 2 * (NG.miss[n.dn] || 0) + (NG.seen[n.dn] ? 0 : 0.8);
+    const st = S.notes.stats[n.key]; const rate = st && st.n >= 3 ? st.err / st.n : 0.15;
+    return (1 + 3 * rate + 2 * (NG.miss[n.key] || 0) + (NG.seen[n.key] ? 0 : 0.8)) * (n.acc ? 2.2 : 1);
   });
   let r = Math.random() * w.reduce((a, b) => a + b, 0);
   for (let i = 0; i < pool.length; i++) { r -= w[i]; if (r <= 0) return pool[i]; }
@@ -708,13 +797,13 @@ function ngNext() {
   if (!NG.running) return;
   if (NG.i >= N_QUESTIONS) return ngFinish();
   const note = pickNote();
-  NG.prevDn = note.dn; NG.seen[note.dn] = 1; NG.i++;
+  NG.prevDn = note.key; NG.seen[note.key] = 1; NG.i++; NG.mod = 0;
   NG.cur = { note, t0: performance.now(), done: false, wrongs: 0 };
   $('npStaff').innerHTML = bigStaff(note, 'pop');
   $('npFb').textContent = ''; $('npFb').className = 'fb';
   $('npCount').textContent = `${NG.i} / ${N_QUESTIONS}`;
   $('npScore').textContent = '✓ ' + NG.correct;
-  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('good', 'badp'));
+  document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('good', 'badp', 'sel'));
   if (NG.mode === 'play') $('pHint').textContent = '';
   resetTimerBar(true);
   clearTimeout(NG.to);
@@ -744,10 +833,10 @@ function ngFinishQuestion(ok, given, timeout) {
     NG.correct++; NG.streak++; NG.bestStreak = Math.max(NG.bestStreak, NG.streak);
     fb.className = 'fb ok'; fb.innerHTML = `${c.note.name} ✓${NG.streak >= 5 && NG.streak % 5 === 0 ? `<small>série de ${NG.streak} ! 🔥</small>` : ''}`;
   } else {
-    NG.streak = 0; NG.miss[c.note.dn] = (NG.miss[c.note.dn] || 0) + 1;
+    NG.streak = 0; NG.miss[c.note.key] = (NG.miss[c.note.key] || 0) + 1;
     fb.className = 'fb bad';
     fb.innerHTML = `C'était ${c.note.name}<small>${timeout ? '⏱ temps écoulé' : '(tu as dit ' + given + ')'}</small>`;
-    if (NG.mode === 'touch') document.querySelectorAll('.nbtn').forEach(b => { if (b.dataset.n === c.note.name) b.classList.add('good'); });
+    if (NG.mode === 'touch') document.querySelectorAll('.nbtn').forEach(b => { if (b.dataset.n === c.note.base || (c.note.acc && +b.dataset.m === c.note.acc)) b.classList.add('good'); });
   }
   const svgNh = document.querySelector('#npStaff .nh'); if (svgNh) svgNh.classList.add(ok ? 'ok' : 'bad');
   $('npScore').textContent = '✓ ' + NG.correct;
@@ -756,7 +845,7 @@ function ngFinishQuestion(ok, given, timeout) {
 function ngFinish() {
   const key = NG.level + '-' + NG.speed;
   NG.running = false; voiceStop(); cancelAnimationFrame(PM.raf); closeMic();
-  for (const r of NG.results) { const st = S.notes.stats[r.note.dn] || (S.notes.stats[r.note.dn] = { n: 0, err: 0 }); st.n++; if (!r.ok || r.wrongs) st.err++; }
+  for (const r of NG.results) { const st = S.notes.stats[r.note.key] || (S.notes.stats[r.note.key] = { n: 0, err: 0 }); st.n++; if (!r.ok || r.wrongs) st.err++; }
   const prevBest = S.notes.best[key];
   S.notes.best[key] = Math.max(prevBest || 0, NG.correct);
   const idx = NG.level * 3 + NG.speed, maxIdx = NOTE_LEVELS.length * 3;
@@ -765,6 +854,7 @@ function ngFinish() {
   save();
   const okTimes = NG.results.filter(r => r.ok).map(r => r.time);
   const avg = okTimes.length ? okTimes.reduce((a, b) => a + b, 0) / okTimes.length : 0;
+  logPush({ m: 'n', l: NG.level, s: NG.speed, mode: NG.mode, sc: NG.correct, t: +avg.toFixed(1), miss: [...new Set(NG.results.filter(r => !r.ok || r.wrongs).map(r => r.note.name))].slice(0, 6) });
   const stars = NG.correct >= 19 ? '⭐⭐⭐' : NG.correct >= PASS ? '⭐⭐' : NG.correct >= 12 ? '⭐' : '';
   let banner = '';
   if (NG.correct >= PASS) {
@@ -774,9 +864,9 @@ function ngFinish() {
   } else banner = `<div class="banner try">Il faut ${PASS}/20 pour passer à la suite. Encore un essai ?</div>`;
   // notes à revoir
   const missed = {};
-  NG.results.forEach(r => { if (!r.ok || r.wrongs) { missed[r.note.dn] = missed[r.note.dn] || { note: r.note, n: 0 }; missed[r.note.dn].n++; } });
+  NG.results.forEach(r => { if (!r.ok || r.wrongs) { missed[r.note.key] = missed[r.note.key] || { note: r.note, n: 0 }; missed[r.note.key].n++; } });
   const ml = Object.values(missed).sort((a, b) => b.n - a.n);
-  const chips = ml.map(m => `<div class="chip">${staffSVG({ S: 6, W: 84, H: 56, yTop: 11, clefX: 4, notes: [{ pos: m.note.pos, x: 48 }] })}<b>${m.note.name}</b><span>${placeName(m.note)}${m.n > 1 ? ' · ×' + m.n : ''}</span></div>`).join('');
+  const chips = ml.map(m => `<div class="chip">${staffSVG({ S: 6, W: 84, H: 56, yTop: 11, clefX: 4, notes: [{ pos: m.note.pos, acc: m.note.acc, x: 48 }] })}<b>${m.note.name}</b><span>${placeName(m.note)}${m.n > 1 ? ' · ×' + m.n : ''}</span></div>`).join('');
   const nextIdx = idx + 1;
   const canNext = NG.correct >= PASS && nextIdx < maxIdx && nextIdx <= unlockedNotes();
   $('nrBody').innerHTML = `
@@ -817,6 +907,17 @@ function voiceTokens(t) {
   return t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/['’`]/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean);
 }
 function noteWords(t) { return voiceTokens(t).map(w => TOK2NOTE[w]).filter(Boolean); }
+const ACC_WORDS = { diese: 1, dieses: 1, dieze: 1, diez: 1, dies: 1, diezes: 1, dieser: 1, bemol: -1, bemols: -1, bemole: -1, bemoles: -1, bemolle: -1, bemoll: -1 };
+const FLAT_TOK = { dob: 'Do', reb: 'Ré', mib: 'Mi', fab: 'Fa', solb: 'Sol', lab: 'La', sib: 'Si' };
+function voiceAnswers(t) { // « fa dièse sol » -> [{n:'Fa', a:1}, {n:'Sol', a:0}]
+  const out = [];
+  voiceTokens(t.replace(/[#♯]/g, ' diese ').replace(/♭/g, ' bemol ')).forEach(w => {
+    if (FLAT_TOK[w]) out.push({ n: FLAT_TOK[w], a: -1 });
+    else if (TOK2NOTE[w]) out.push({ n: TOK2NOTE[w], a: 0 });
+    else if (ACC_WORDS[w] && out.length && !out[out.length - 1].a) out[out.length - 1].a = ACC_WORDS[w];
+  });
+  return out;
+}
 const VO = { rec: null, wanted: false, used: {}, lastNote: null, lastTime: 0, fails: 0, failT: 0 };
 function voiceUI(on) { $('vMic').classList.toggle('on', on); $('vState').textContent = on ? "Je t'écoute…" : 'Écoute arrêtée'; $('vRestart').classList.toggle('hidden', on || !VO.wanted); }
 function voiceStart() {
@@ -831,8 +932,14 @@ function voiceStart() {
       const tr = e.results[i][0].transcript;
       const words = voiceTokens(tr);
       if (words.length) $('vHeard').textContent = '« ' + words.slice(-3).join(' ') + ' »';
-      const notes = noteWords(tr), used = VO.used[i] || 0;
-      if (notes.length > used) { VO.used[i] = notes.length; voiceNote(notes[notes.length - 1]); }
+      const notes = voiceAnswers(tr), used = VO.used[i] || 0;
+      if (notes.length > used) {
+        const last = notes[notes.length - 1], name = last.n + (last.a > 0 ? '♯' : last.a < 0 ? '♭' : '');
+        const submit = () => { VO.used[i] = Math.max(VO.used[i] || 0, notes.length); voiceNote(name); };
+        clearTimeout(VO.t);
+        // avec les altérations, on attend un instant : « dièse » ou « bémol » peut encore arriver
+        if (!NG.acc || last.a || e.results[i].isFinal) submit(); else VO.t = setTimeout(submit, 900);
+      }
     }
   };
   rec.onerror = e => {
@@ -860,7 +967,7 @@ function voiceNote(n) {
   ngAnswer(n, null);
 }
 function voiceStop() {
-  VO.wanted = false;
+  VO.wanted = false; clearTimeout(VO.t);
   const r = VO.rec; VO.rec = null;
   if (r) { try { r.onend = null; r.abort(); } catch (e) {} }
 }
@@ -889,19 +996,30 @@ function playLoop() {
 /* =========================================================
    RYTHME
    ========================================================= */
-// durées en croches : 1 = croche, 2 = noire, 4 = blanche, 8 = ronde
+// durées en ticks : 12 = noire, 6 = croche, 3 = double croche, 4 = croche de triolet (négatif = silence)
 const CELL = {
-  N: { beats: 1, ev: [[2, 0]] }, S: { beats: 1, ev: [[2, 1]] },
-  CC: { beats: 1, ev: [[1, 0], [1, 0]] }, Cd: { beats: 1, ev: [[1, 0], [1, 1]] }, dC: { beats: 1, ev: [[1, 1], [1, 0]] },
-  B: { beats: 2, ev: [[4, 0]] }, P: { beats: 2, ev: [[4, 1]] },
-  R: { beats: 4, ev: [[8, 0]] }, Pa: { beats: 4, ev: [[8, 1]] }
+  N: { beats: 1, ev: [12] }, S: { beats: 1, ev: [-12] },
+  CC: { beats: 1, ev: [6, 6] }, Cd: { beats: 1, ev: [6, -6] }, dC: { beats: 1, ev: [-6, 6] },
+  B: { beats: 2, ev: [24] }, P: { beats: 2, ev: [-24] },
+  R: { beats: 4, ev: [48] }, Pa: { beats: 4, ev: [-48] },
+  NpC: { beats: 2, ev: [18, 6] },
+  D4: { beats: 1, ev: [3, 3, 3, 3] }, CDD: { beats: 1, ev: [6, 3, 3] }, DDC: { beats: 1, ev: [3, 3, 6] },
+  CpD: { beats: 1, ev: [9, 3] }, TRI: { beats: 1, ev: [4, 4, 4], tri: true },
+  SYN: { beats: 1, ev: [3, 6, 3] }, qD3: { beats: 1, ev: [-3, 3, 3, 3] }, dDD: { beats: 1, ev: [-6, 3, 3] }
 };
 const RHY_LEVELS = [
   { name: 'Noires, blanches, rondes', sub: 'Compter les temps', cells: { N: 5, B: 3, R: 1 }, bars: 2, need: null, tempi: [60, 72, 84] },
   { name: '+ les silences', sub: 'Soupir, demi-pause, pause', cells: { N: 5, B: 2.6, R: 0.7, S: 2.4, P: 1.2, Pa: 0.5 }, bars: 2, need: ['S', 'P', 'Pa'], tempi: [60, 72, 84] },
   { name: '+ les croches', sub: 'Deux croches dans un temps', cells: { N: 4, B: 2, R: 0.4, S: 1.5, P: 0.8, CC: 4 }, bars: 2, need: ['CC'], tempi: [60, 72, 84] },
   { name: '+ le demi-soupir', sub: 'Croche et demi-soupir', cells: { N: 3, B: 1.6, R: 0.3, S: 1.3, P: 0.6, CC: 3, Cd: 1.6, dC: 1.6 }, bars: 2, need: ['Cd', 'dC'], tempi: [56, 66, 80] },
-  { name: 'Tout mélangé', sub: '4 mesures', cells: { N: 3, B: 1.6, R: 0.4, S: 1.3, P: 0.7, Pa: 0.3, CC: 3, Cd: 1.2, dC: 1.2 }, bars: 4, need: null, tempi: [66, 80, 96] }
+  { name: 'Tout mélangé', sub: '4 mesures', cells: { N: 3, B: 1.6, R: 0.4, S: 1.3, P: 0.7, Pa: 0.3, CC: 3, Cd: 1.2, dC: 1.2 }, bars: 4, need: null, tempi: [66, 80, 96] },
+  { name: 'Noire pointée – croche', sub: 'Une note longue, puis une courte', cells: { N: 4, B: 1.5, S: 1.2, CC: 3, NpC: 4.5 }, bars: 2, need: ['NpC'], tempi: [60, 72, 84] },
+  { name: 'Les doubles croches', sub: 'Quatre notes dans un temps', cells: { N: 4, B: 1, S: 1.2, CC: 3, D4: 3.5 }, bars: 2, bpl: 1, need: ['D4'], tempi: [50, 60, 72] },
+  { name: 'Croche – deux doubles', sub: 'Et deux doubles – croche', cells: { N: 3.5, S: 1, CC: 3, D4: 1.5, CDD: 3, DDC: 3 }, bars: 2, bpl: 1, need: ['CDD', 'DDC'], tempi: [50, 60, 72] },
+  { name: 'Croche pointée – double', sub: 'Le rythme « sautillé »', cells: { N: 3.5, S: 1, CC: 3, D4: 1, CDD: 1, CpD: 4.5, NpC: 1 }, bars: 2, bpl: 1, need: ['CpD'], tempi: [50, 60, 72] },
+  { name: 'Le triolet', sub: 'Trois notes égales dans un temps', cells: { N: 4, B: 1, S: 1, CC: 3.5, TRI: 4.5 }, bars: 2, bpl: 1, need: ['TRI'], tempi: [56, 66, 80] },
+  { name: 'Syncopette et quart de soupir', sub: 'Les doubles à contretemps', cells: { N: 3.5, S: 1, CC: 2.5, D4: 1.5, CDD: 1.5, SYN: 3, qD3: 2.5, dDD: 2 }, bars: 2, bpl: 1, need: ['SYN', 'qD3', 'dDD'], tempi: [50, 58, 69] },
+  { name: 'Grand mélange', sub: 'Tous les rythmes', cells: { N: 3, B: 1, S: 1, P: .5, CC: 2.5, Cd: .8, dC: .8, NpC: 1.5, D4: 1.5, CDD: 1.5, DDC: 1.5, CpD: 1.5, TRI: 1.5, SYN: 1.2, qD3: 1, dDD: .8 }, bars: 2, bpl: 1, need: null, tempi: [56, 66, 80] }
 ];
 const RHY_WINS = 3, RHY_PASS = 0.8;
 
@@ -929,45 +1047,54 @@ function genExercise(li, prevSig) {
       }
       prevPa = bc[0] === 'Pa';
       // pas de mesure faite uniquement de silences (sauf la pause)
-      if (!prevPa && bc.every(k => CELL[k].ev.every(e => e[1]))) ok = false;
+      if (!prevPa && bc.every(k => CELL[k].ev.every(d => d < 0))) ok = false;
       cells.push(...bc);
     }
     if (!ok) continue;
     let pos = 0;
-    for (const k of cells) for (const [d, r] of CELL[k].ev) { events.push({ dur: d, rest: !!r, start: pos, cell: k }); pos += d; }
+    for (const k of cells) { const tri = CELL[k].tri ? {} : null; for (const d of CELL[k].ev) { events.push({ dur: Math.abs(d), rest: d < 0, start: pos, cell: k, tri }); pos += Math.abs(d); } }
     const notes = events.filter(e => !e.rest);
-    const restEighths = events.filter(e => e.rest).reduce((a, e) => a + e.dur, 0);
+    const restTicks = events.filter(e => e.rest).reduce((a, e) => a + e.dur, 0);
     if (notes.length < (lv.bars === 2 ? 3 : 6)) continue;
-    if (restEighths > lv.bars * 8 * 0.34) continue;
+    if (restTicks > lv.bars * 48 * 0.34) continue;
     if (li <= 2 && events[0].rest) continue;
     if (lv.need && !cells.some(k => lv.need.includes(k))) continue;
-    if (events[events.length - 1].rest && events[events.length - 1].dur >= 4 && li < 4) continue;
+    if (events[events.length - 1].rest && events[events.length - 1].dur >= 24 && li !== 4) continue;
     const sig = cells.join(',');
     if (sig === prevSig) continue;
-    return { bars: lv.bars, events, sig };
+    return { bars: lv.bars, bpl: lv.bpl || 2, events, sig };
   }
-  return { bars: 2, events: [{ dur: 2, rest: false, start: 0 }, { dur: 2, rest: false, start: 2 }, { dur: 4, rest: false, start: 4 }, { dur: 8, rest: false, start: 8 }], sig: 'x' };
+  return { bars: 2, bpl: 2, events: [{ dur: 12, rest: false, start: 0 }, { dur: 12, rest: false, start: 12 }, { dur: 24, rest: false, start: 24 }, { dur: 48, rest: false, start: 48 }], sig: 'x' };
 }
 
 // --- Gravure d'une ligne de rythme ---
 const RS = 10, RW = 400, RH = 100, RYT = 38;
-function lineGeom(line) { const contentX = line === 0 ? 72 : 46, endX = RW - 6; return { contentX, endX, barW: (endX - contentX) / 2 }; }
+function lineGeom(line, bpl) { const contentX = line === 0 ? 72 : 46, endX = RW - 6; return { contentX, endX, barW: (endX - contentX) / bpl }; }
 // largeur minimale (en interlignes) dont chaque figure a besoin pour ne pas toucher la suivante
-function reqW(e) { return e.rest ? (e.dur === 1 ? 1.5 : e.dur === 8 ? 3 : 2.0) : (e.dur === 1 ? (e.beamed ? 1.7 : 2.6) : 2.3); }
+function reqW(e) {
+  if (e.rest) return e.dur === 48 ? 3 : e.dur <= 6 ? 1.6 : 2.0;
+  if (e.grp != null) return (e.dur <= 4 ? 1.55 : e.dur === 6 ? 1.75 : 2.4) + (e.gi === e.gn - 1 && LAY_BPL === 1 ? 0.75 : 0);
+  return e.dur === 18 || e.dur === 9 ? 3.0 : e.dur <= 6 ? 2.6 : 2.3;
+}
+let LAY_BPL = 2;
 function layoutExercise(ex) {
-  const ev = ex.events;
-  ev.forEach((e, i) => { e.beamed = false; });
-  ev.forEach((e, i) => {
-    const n = ev[i + 1];
-    if (!e.rest && e.dur === 1 && (e.start % 8) % 2 === 0 && n && !n.rest && n.dur === 1 && n.start === e.start + 1) { e.beamed = true; n.beamed = true; }
-  });
+  const ev = ex.events, bpl = ex.bpl || 2; LAY_BPL = bpl;
+  // groupes de ligature : notes consécutives (sans silence) dans un même temps, plus courtes qu'une noire
+  ev.forEach(e => { e.grp = null; });
+  let g = 0;
+  for (let i = 0; i < ev.length; i++) {
+    const e = ev[i]; if (e.rest || e.dur >= 12) continue;
+    const beat = Math.floor(e.start / 12); let j = i;
+    while (j + 1 < ev.length && !ev[j + 1].rest && ev[j + 1].dur < 12 && Math.floor(ev[j + 1].start / 12) === beat) j++;
+    if (j > i) { for (let k = i; k <= j; k++) { ev[k].grp = g; ev[k].gi = k - i; ev[k].gn = j - i + 1; } g++; i = j; }
+  }
   ex.layout = [];
   for (let bar = 0; bar < ex.bars; bar++) {
-    const line = Math.floor(bar / 2), j = bar % 2, G = lineGeom(line);
+    const line = Math.floor(bar / bpl), j = bar % bpl, G = lineGeom(line, bpl);
     const bx = G.contentX + j * G.barW, last = bar === ex.bars - 1;
     const padL = 1.0 * RS, padR = (last ? 2.1 : 1.2) * RS, avail = G.barW - padL - padR;
-    const items = ev.map((e, i) => ({ e, i })).filter(o => Math.floor(o.e.start / 8) === bar);
-    let w = items.map(o => o.e.dur * avail / 8);
+    const items = ev.map((e, i) => ({ e, i })).filter(o => Math.floor(o.e.start / 48) === bar);
+    let w = items.map(o => o.e.dur * avail / 48);
     const req = items.map(o => reqW(o.e) * RS);
     for (let it = 0; it < 6; it++) {
       let deficit = 0; w.forEach((x, k) => { if (x < req[k]) { deficit += req[k] - x; w[k] = req[k]; } });
@@ -978,13 +1105,13 @@ function layoutExercise(ex) {
       w = w.map((x, k) => x > req[k] ? x - (x - req[k]) * f : x);
     }
     let x = bx + padL; const slots = [];
-    items.forEach((o, k) => { slots.push({ i: o.i, s: o.e.start - bar * 8, d: o.e.dur, x, w: w[k] }); x += w[k]; });
+    items.forEach((o, k) => { slots.push({ i: o.i, s: o.e.start - bar * 48, d: o.e.dur, x, w: w[k] }); x += w[k]; });
     ex.layout.push({ line, bx, barW: G.barW, slots, last });
   }
 }
 function rX(ex, beats) { // position (ligne, x) correspondant à un instant (en temps depuis le début)
-  const eighths = Math.max(0, Math.min(ex.bars * 8 - 0.001, beats * 2));
-  const bar = Math.floor(eighths / 8), L = ex.layout[bar], inBar = eighths - bar * 8;
+  const ticks = Math.max(0, Math.min(ex.bars * 48 - 0.001, beats * 12));
+  const bar = Math.floor(ticks / 48), L = ex.layout[bar], inBar = ticks - bar * 48;
   let sl = L.slots[0];
   for (const s of L.slots) if (inBar >= s.s) sl = s;
   const x = sl.x + Math.min(1, (inBar - sl.s) / sl.d) * sl.w;
@@ -993,11 +1120,11 @@ function rX(ex, beats) { // position (ligne, x) correspondant à un instant (en 
 function renderRhythm(ex) {
   layoutExercise(ex);
   const yB = RYT + 4 * RS, y = p => yB - p * RS / 2, yG = y(2);
-  const stemTop = yG - 3.5 * RS, st = 0.12 * RS;
-  const nLines = Math.ceil(ex.bars / 2);
+  const stemTop = yG - 3.5 * RS, st = 0.12 * RS, bh = 0.5 * RS, HW = 1.18 * RS;
+  const nLines = Math.ceil(ex.bars / (ex.bpl || 2));
   let html = '';
   for (let line = 0; line < nLines; line++) {
-    const G = lineGeom(line);
+    const G = lineGeom(line, ex.bpl || 2);
     let s = `<svg class="staff" viewBox="0 0 ${RW} ${RH}" id="rl${line}" aria-label="rythme, ligne ${line + 1}">`;
     s += `<g class="marks"></g>`;
     for (let i = 0; i < 5; i++) s += rect(2, RYT + i * RS - 0.065 * RS, G.endX - 2, 0.13 * RS, 'sl');
@@ -1011,18 +1138,26 @@ function renderRhythm(ex) {
         const e = ex.events[sl.i], x = sl.x;
         let g = `<g class="ev" id="ev${sl.i}">`;
         if (e.rest) {
-          if (e.dur === 8) g += glyph('rWhole', L.bx + (L.barW - 1.13 * RS) / 2, y(6), RS);
-          else if (e.dur === 4) g += glyph('rHalf', x, y(4), RS);
-          else if (e.dur === 2) g += glyph('rQuarter', x, y(4), RS);
-          else g += glyph('r8', x, y(4), RS);
+          if (e.dur === 48) g += glyph('rWhole', L.bx + (L.barW - 1.13 * RS) / 2, y(6), RS);
+          else if (e.dur === 24) g += glyph('rHalf', x, y(4), RS);
+          else if (e.dur === 12) g += glyph('rQuarter', x, y(4), RS);
+          else if (e.dur === 6) g += glyph('r8', x, y(4), RS);
+          else g += glyph('r16', x, y(4), RS);
         } else {
-          g += glyph(e.dur === 8 ? 'whole' : e.dur === 4 ? 'half' : 'black', x, yG, RS);
-          if (e.dur <= 4) g += rect(x + 1.18 * RS - st, stemTop, st, yG - 0.17 * RS - stemTop);
-          if (e.dur === 1) {
-            const nx = L.slots[k + 1];
-            if (e.beamed && (e.start % 8) % 2 === 0 && nx && ex.events[nx.i].beamed && ex.events[nx.i].start === e.start + 1) {
-              g += rect(x + 1.18 * RS - st, stemTop, (nx.x + 1.18 * RS) - (x + 1.18 * RS - st), 0.5 * RS);
-            } else if (!e.beamed) g += glyph('flag8Up', x + 1.18 * RS - st, stemTop, RS);
+          g += glyph(e.dur === 48 ? 'whole' : e.dur === 24 ? 'half' : 'black', x, yG, RS);
+          if (e.dur < 48) g += rect(x + HW - st, stemTop, st, yG - 0.17 * RS - stemTop);
+          if (e.dur === 18 || e.dur === 9) g += `<circle cx="${(x + HW + 0.55 * RS).toFixed(2)}" cy="${y(3).toFixed(2)}" r="${(0.21 * RS).toFixed(2)}"/>`;
+          if (e.grp == null && e.dur < 12) g += glyph(e.dur === 3 ? 'flag16Up' : 'flag8Up', x + HW - st, stemTop, RS);
+          if (e.grp != null) {
+            const nx = L.slots[k + 1], pv = L.slots[k - 1];
+            const nextIn = e.gi < e.gn - 1 && nx, prevIn = e.gi > 0 && pv;
+            if (nextIn) g += rect(x + HW - st, stemTop, nx.x - x + st, bh);                       // ligature principale
+            if (e.dur === 3) {                                                                     // deuxième barre des doubles
+              const nx16 = nextIn && ex.events[nx.i].dur === 3, pv16 = prevIn && ex.events[pv.i].dur === 3;
+              if (nx16) g += rect(x + HW - st, stemTop + 0.75 * RS, nx.x - x + st, bh);
+              else if (!pv16) g += e.gi === 0 ? rect(x + HW - st, stemTop + 0.75 * RS, 0.95 * RS, bh) : rect(x + HW - 0.95 * RS, stemTop + 0.75 * RS, 0.95 * RS, bh);
+            }
+            if (e.tri && e.gi === 1) g += `<text class="t3" x="${(x + HW).toFixed(1)}" y="${(stemTop - 0.45 * RS).toFixed(1)}" text-anchor="middle" font-size="${1.5 * RS}" font-style="italic" font-weight="700" font-family="Georgia,'Times New Roman',serif">3</text>`;
           }
         }
         s += g + '</g>';
@@ -1123,7 +1258,7 @@ async function rgRun(kind) {
   const pre = kind === 'play' ? 0.5 : 0.15, t0 = c.currentTime + pre, tStart = t0 + 4 * beat, nBeats = RG.ex.bars * 4;
   for (let i = 0; i < 4; i++) click(bus, t0 + i * beat, i === 0, 1);
   if (kind === 'listen') {
-    for (const e of RG.ex.events) if (!e.rest) tone(bus, tStart + e.start / 2 * beat, e.dur / 2 * beat * 0.92, 67 - transp());
+    for (const e of RG.ex.events) if (!e.rest) tone(bus, tStart + e.start / 12 * beat, e.dur / 12 * beat * 0.92, 67 - transp());
     for (let b = 0; b < nBeats; b++) click(bus, tStart + b * beat, b % 4 === 0, 0.3);
   } else if (kind === 'tap' && S.settings.metro) {
     for (let b = 0; b < nBeats; b++) click(bus, tStart + b * beat, b % 4 === 0, 0.45);
@@ -1248,7 +1383,7 @@ function micLatency(countStart) {
 // Évaluation
 function evaluate(ex, hits, beatMs, kind) {
   const notes = [];
-  ex.events.forEach((e, i) => { if (!e.rest) notes.push({ i, e, t: e.start / 2 * beatMs, len: e.dur / 2 * beatMs }); });
+  ex.events.forEach((e, i) => { if (!e.rest) notes.push({ i, e, t: e.start / 12 * beatMs, len: e.dur / 12 * beatMs }); });
   const good = Math.min(90, Math.max(60, 0.12 * beatMs));
   notes.forEach((n, k) => {
     const gp = k > 0 ? n.t - notes[k - 1].t : 1e9, gn = k < notes.length - 1 ? notes[k + 1].t - n.t : 1e9;
@@ -1263,7 +1398,7 @@ function evaluate(ex, hits, beatMs, kind) {
   for (const n of notes) {
     if (!n.hit) { n.st = 'miss'; miss++; continue; }
     n.st = Math.abs(n.d) <= good ? 'ok' : 'near'; errs.push(n.d);
-    if (n.e.dur >= 4 && n.hit.up != null && (n.hit.up - n.hit.t) < 0.6 * n.len) { n.short = true; short++; if (n.st === 'ok') n.st = 'near'; }
+    if (n.e.dur >= 24 && n.hit.up != null && (n.hit.up - n.hit.t) < 0.6 * n.len) { n.short = true; short++; if (n.st === 'ok') n.st = 'near'; }
     if (n.st === 'ok') ok++; else nr++;
   }
   const total = ex.bars * 4 * beatMs; let extra = 0, restExtra = false;
@@ -1272,7 +1407,7 @@ function evaluate(ex, hits, beatMs, kind) {
     if (h.t < -0.45 * beatMs || h.t > total + 150) continue;
     if (kind === 'play' && hits.some(o => o.note && h.t > o.t && h.t - o.t < 150)) continue;
     h.extra = true; extra++;
-    if (ex.events.some(e => e.rest && h.t >= e.start / 2 * beatMs - 60 && h.t < (e.start + e.dur) / 2 * beatMs - 60)) restExtra = true;
+    if (ex.events.some(e => e.rest && e.dur >= 6 && h.t >= e.start / 12 * beatMs - 60 && h.t < (e.start + e.dur) / 12 * beatMs - 60)) restExtra = true;
   }
   const pts = ok + 0.6 * nr - (kind === 'tap' ? 0.5 : 0.3) * extra;
   const score = Math.max(0, Math.min(1, pts / notes.length));
@@ -1291,6 +1426,7 @@ function showRhythmResult(r) {
     g.insertAdjacentHTML('beforeend', `<path class="mk ${cls}" d="M${(p.x - 4).toFixed(1)} 8 L${(p.x + 4).toFixed(1)} 8 L${p.x.toFixed(1)} 15 Z"/>`);
   }
   const pct = Math.round(r.score * 100);
+  logPush({ m: 'r', l: RG.level, s: RG.stage, mode: RG.kind, sc: pct, mean: Math.round(r.mean), miss: r.miss, extra: r.extra });
   const key = RG.level + '-' + RG.stage;
   S.rhythm.best[key] = Math.max(S.rhythm.best[key] || 0, pct);
   let unlockMsg = '';
@@ -1332,6 +1468,254 @@ function showRhythmResult(r) {
 }
 
 /* =========================================================
+   ÉCOUTE ET REJOUE
+   ========================================================= */
+const EAR_LEVELS = [
+  { name: 'Do Ré Mi', from: 'C4', to: 'E4', k: 2, len: 3, span: 2, leap: 2 },
+  { name: 'Do Ré Mi', from: 'C4', to: 'E4', k: 3, len: 3, span: 2, leap: 2 },
+  { name: 'De Do à Sol', from: 'C4', to: 'G4', k: 3, len: 4, span: 4, leap: 3 },
+  { name: 'De Do à Sol', from: 'C4', to: 'G4', k: 4, len: 4, span: 4, leap: 4 },
+  { name: "Jusqu'au Do aigu", from: 'C4', to: 'C5', k: 4, len: 5, span: 5, leap: 4 },
+  { name: 'Toute la tessiture', from: 'G3', to: 'G5', k: 4, len: 5, span: 7, leap: 5 }
+];
+const EAR_WINS = 4;
+const EG = { listening: false, raf: 0, busy: false, prevSig: null, to: 0 };
+const EP = { cand: null, count: 0, armed: true, last: null, silent: 0 };
+function unlockedEar() { return S.settings.teacher ? 999 : S.ear.unlocked; }
+function earName(n) { return n.name + (n.dn < 28 ? ' grave' : n.dn >= 35 ? ' aigu' : ''); }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function renderEarMenu() {
+  const seg = $('earModeSeg');
+  seg.querySelectorAll('button').forEach(b => {
+    const m = b.dataset.mode;
+    b.classList.toggle('dis', m === 'play' && !CAN_MIC);
+    b.onclick = () => { S.settings.earMode = m; save(); renderEarMenu(); };
+  });
+  const mode = S.settings.earMode; setSeg(seg, 'mode', mode);
+  const help = $('earModeHelp'); help.classList.remove('warn');
+  if (mode === 'touch') help.textContent = "Écoute la mélodie, puis touche les notes dans le bon ordre.";
+  else if (CAN_MIC) help.textContent = "Écoute la mélodie, puis rejoue-la à la trompette. Tu peux la réécouter autant de fois que tu veux.";
+  else { help.classList.add('warn'); help.textContent = MIC_BLOCKED_MSG; }
+  const box = $('earLevels'); box.innerHTML = '';
+  const un = unlockedEar();
+  EAR_LEVELS.forEach((lv, li) => {
+    const locked = li > un, wins = Math.min(EAR_WINS, S.ear.wins[li] || 0), done = wins >= EAR_WINS;
+    const d = document.createElement('div');
+    d.className = 'level' + (locked ? ' locked' : '');
+    d.innerHTML = `<div class="lv-head"><div class="lv-num">${locked ? '🔒' : li + 1}</div><div><div class="lv-name">${lv.name}</div><div class="lv-sub">${lv.len} notes à rejouer, parmi ${lv.k} · ${done ? '✓ réussi' : '●'.repeat(wins) + '○'.repeat(EAR_WINS - wins)}</div></div><button class="btn sm ${done ? 'ghost' : 'primary'}" style="margin-left:auto;flex:none">Jouer</button></div>`;
+    d.querySelector('button').onclick = e => { if (locked) { flash(e.target); return; } egPrepare(li); };
+    box.appendChild(d);
+  });
+}
+function genEar(li) {
+  const lv = EAR_LEVELS[li], lo = dnOf(lv.from), hi = dnOf(lv.to);
+  for (let t = 0; t < 400; t++) {
+    const base = lo + Math.floor(Math.random() * (hi - lo + 1)), cand = [];
+    for (let d = base; d <= Math.min(hi, base + lv.span); d++) cand.push(d);
+    if (cand.length < lv.k) continue;
+    const set = shuffle(cand).slice(0, lv.k), mel = shuffle(set.slice());
+    while (mel.length < lv.len) { const c = set.filter(d => d !== mel[mel.length - 1]); mel.push(c[Math.floor(Math.random() * c.length)]); }
+    if (mel.some((d, i) => i && Math.abs(d - mel[i - 1]) > lv.leap)) continue;
+    const sig = mel.join(','); if (sig === EG.prevSig) continue;
+    set.sort((a, b) => a - b);
+    if (set.join(',') === sig) set.reverse();
+    return { set: set.map(noteFromDn), mel: mel.map(noteFromDn), sig };
+  }
+  return { set: [noteFromDn(28), noteFromDn(30)], mel: [28, 30, 28].map(noteFromDn), sig: 'x' };
+}
+function egPrepare(li) {
+  const mode = S.settings.earMode;
+  if (mode === 'play' && !CAN_MIC) { flash($('earModeHelp')); return; }
+  Object.assign(EG, { level: li, mode });
+  $('epTitle').textContent = `Niveau ${li + 1}`;
+  show('ear-play'); egNew();
+}
+function egDots() { const w = Math.min(EAR_WINS, S.ear.wins[EG.level] || 0); $('epDots').textContent = '●'.repeat(w) + '○'.repeat(EAR_WINS - w); }
+function egSlots() {
+  $('epSlots').innerHTML = EG.ex.mel.map((n, i) => i < EG.pos ? `<i class="ok">${earName(n)}</i>` : `<i>${i + 1}</i>`).join('');
+}
+function egNew() {
+  egStopListen();
+  EG.ex = genEar(EG.level); EG.prevSig = EG.ex.sig;
+  Object.assign(EG, { pos: 0, tries: 0, heard: false, busy: false });
+  $('epSet').innerHTML = EG.ex.set.map(n => `<span>${earName(n)}</span>`).join('');
+  $('epStaff').innerHTML = ''; $('epResult').classList.add('hidden'); $('epActions').classList.remove('hidden');
+  $('epGo').classList.toggle('hidden', EG.mode !== 'play');
+  const tb = $('epTouch'); tb.innerHTML = ''; tb.classList.toggle('hidden', EG.mode !== 'touch');
+  if (EG.mode === 'touch') EG.ex.set.slice().sort((a, b) => a.dn - b.dn).forEach(n => {
+    const b = document.createElement('button'); b.className = 'nbtn'; b.style.fontSize = '17px'; b.textContent = earName(n);
+    b.addEventListener('pointerdown', e => { e.preventDefault(); if (!EG.heard) { flash($('epListen')); return; } if (!EG.busy) egAnswer(n.midi); });
+    tb.appendChild(b);
+  });
+  egSlots(); egDots(); egMsg("Écoute d'abord la mélodie.");
+}
+function egMsg(t) { $('epMsg').className = 'rp-msg'; $('epMsg').style.fontSize = '17px'; $('epMsg').textContent = t; }
+$('epListen').onclick = () => {
+  if (EG.busy) return;
+  egStopListen();
+  const c = ctx(); setSession('playback');
+  const beat = 0.72, t0 = c.currentTime + 0.15, n = EG.ex.mel.length;
+  const bus = c.createGain(); bus.connect(c.destination); EG.bus = bus;
+  EG.ex.mel.forEach((nt, i) => tone(bus, t0 + i * beat, (i === n - 1 ? 1.5 : 0.9) * beat, nt.midi - transp()));
+  EG.busy = true; egMsg('Écoute… 👂');
+  clearTimeout(EG.to);
+  EG.to = setTimeout(() => { EG.busy = false; EG.heard = true; try { bus.disconnect(); } catch (e) {} if (!$('epResult').classList.contains('hidden')) return; egMsg(EG.mode === 'play' ? "À toi ! Tu peux aussi réécouter." : "Touche les notes dans l'ordre. Tu peux aussi réécouter."); }, (0.15 + (n + 0.6) * beat) * 1000);
+};
+$('epGo').onclick = async () => {
+  if (EG.busy || EG.listening) return;
+  if (!EG.heard) { flash($('epListen')); return; }
+  ctx();
+  try { await openMic(); } catch (e) { egMsg("Micro refusé : autorise-le dans les réglages du navigateur, ou passe en mode Toucher."); return; }
+  Object.assign(EP, { cand: null, count: 0, armed: true, last: null, silent: 0 });
+  EG.pos = 0; egSlots();
+  EG.listening = true; $('epMic').classList.remove('hidden'); $('epActions').classList.add('hidden'); $('epHeard').textContent = '';
+  egMsg('Joue la mélodie 🎺');
+  EG.raf = requestAnimationFrame(earLoop);
+};
+$('epStopMic').onclick = () => { egStopListen(); egMsg("Réécoute si tu veux, puis réessaie."); };
+$('epQuit').onclick = () => { stopAll(); renderEarMenu(); show('ear'); };
+function earLoop() {
+  if (!EG.listening || !mic) return;
+  const r = yin(readMic(), actx.sampleRate);
+  $('epMeter').style.transform = `scaleX(${Math.min(1, r.rms * 10).toFixed(3)})`;
+  if (!r.f || r.rms < 0.012) { if (++EP.silent > 4) { EP.armed = true; EP.cand = null; EP.count = 0; } }
+  else {
+    EP.silent = 0;
+    const w = Math.round(69 + 12 * Math.log2(r.f / 440)) + transp();
+    if (w === EP.cand) EP.count++; else { EP.cand = w; EP.count = 1; }
+    if (EP.count >= 5 && w >= 50 && w <= 86 && (EP.armed || w !== EP.last)) { EP.armed = false; EP.last = w; $('epHeard').textContent = chromaName(w); egAnswer(w); }
+  }
+  if (EG.listening) EG.raf = requestAnimationFrame(earLoop);
+}
+function egStopListen() {
+  EG.listening = false; cancelAnimationFrame(EG.raf);
+  $('epMic').classList.add('hidden');
+  if ($('epResult').classList.contains('hidden')) $('epActions').classList.remove('hidden');
+  closeMic();
+}
+function egAnswer(midi) {
+  const exp = EG.ex.mel[EG.pos]; if (!exp) return;
+  if (midi === exp.midi) {
+    EG.pos++; egSlots();
+    if (EG.pos >= EG.ex.mel.length) egWin();
+    return;
+  }
+  // erreur : on montre la note jouée, puis on repart du début
+  EG.tries++;
+  const slots = $('epSlots').children, sl = slots[EG.pos];
+  const played = EG.ex.set.find(n => n.midi === midi);
+  if (sl) { sl.className = 'bad'; sl.textContent = played ? earName(played) : chromaName(midi); }
+  const oct = ((midi - exp.midi) % 12 + 12) % 12 === 0;
+  egStopListen(); EG.busy = true;
+  egMsg(oct ? `Note ${EG.pos + 1} : bonne note, mais pas à la bonne hauteur. Réécoute !` : `Note ${EG.pos + 1} : ce n'est pas celle-là. Réécoute et réessaie !`);
+  clearTimeout(EG.to);
+  EG.to = setTimeout(() => { EG.busy = false; EG.pos = 0; egSlots(); }, 1400);
+}
+function egWin() {
+  egStopListen();
+  const counts = EG.tries <= 1, li = EG.level;
+  logPush({ m: 'e', l: li, mode: EG.mode, tries: EG.tries });
+  let banner;
+  if (counts) {
+    const w = (S.ear.wins[li] || 0) + 1; S.ear.wins[li] = w;
+    if (w >= EAR_WINS && S.ear.unlocked <= li) {
+      S.ear.unlocked = Math.min(EAR_LEVELS.length, li + 1);
+      banner = li + 1 < EAR_LEVELS.length ? `<div class="banner ok">🎉 Niveau ${li + 2} débloqué !</div>` : `<div class="banner ok">🏆 Tous les niveaux d'écoute sont réussis !</div>`;
+    } else if (w < EAR_WINS) banner = `<div class="banner try">Encore ${EAR_WINS - w} mélodie${EAR_WINS - w > 1 ? 's' : ''} réussie${EAR_WINS - w > 1 ? 's' : ''} pour passer à la suite.</div>`;
+    else banner = '';
+    save();
+  } else banner = `<div class="banner try">Trouvé, mais après ${EG.tries} erreurs : ça ne compte pas pour la progression. La prochaine sera la bonne !</div>`;
+  egDots();
+  const xs = EG.ex.mel.map((n, i) => ({ pos: n.pos, x: 78 + i * 40, cls: 'ok' }));
+  $('epStaff').innerHTML = staffSVG({ S: 11, W: 300, H: 112, yTop: 26, clefX: 10, notes: xs, label: 'la mélodie' });
+  egMsg(EG.tries === 0 ? 'Du premier coup ! 🎯' : 'Bravo, trouvé ! 👏');
+  $('epActions').classList.add('hidden'); $('epTouch').classList.add('hidden');
+  const box = $('epResult');
+  box.innerHTML = `${banner}<div class="row"><button class="btn ghost" id="erHear">▶︎ Réécouter</button><button class="btn primary" id="erNext">Suivant →</button></div>`;
+  box.classList.remove('hidden');
+  $('erHear').onclick = () => { EG.busy = false; $('epListen').onclick(); };
+  $('erNext').onclick = () => {
+    if ((S.ear.wins[li] || 0) >= EAR_WINS && li + 1 < EAR_LEVELS.length && li + 1 <= unlockedEar() && banner.includes('🎉')) egPrepare(li + 1);
+    else egNew();
+  };
+}
+function egStop() { clearTimeout(EG.to); EG.busy = false; if (EG.listening) { EG.listening = false; cancelAnimationFrame(EG.raf); } try { EG.bus && EG.bus.disconnect(); } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (document.hidden && current === 'ear-play') { egStop(); $('epMic').classList.add('hidden'); if ($('epResult').classList.contains('hidden')) $('epActions').classList.remove('hidden'); closeMic(); } });
+['touchstart', 'touchend'].forEach(t => $('epTouch').addEventListener(t, e => e.preventDefault(), { passive: false }));
+
+/* =========================================================
+   SUIVI (bilan pour le professeur)
+   ========================================================= */
+function svData() {
+  const now = Date.now(), week = S.log.filter(e => now - e.d < 7 * 864e5);
+  const days = new Set(week.map(e => new Date(e.d).toDateString())).size;
+  const cnt = m => week.filter(e => e.m === m).length;
+  // notes fragiles
+  const weak = Object.entries(S.notes.stats).map(([k, st]) => ({ note: noteFromKey(k), n: st.n, rate: st.err / st.n })).filter(x => x.note && x.n >= 4 && x.rate >= 0.25).sort((a, b) => b.rate - a.rate).slice(0, 8);
+  const nlog = S.log.filter(e => e.m === 'n').slice(-8), rlog = S.log.filter(e => e.m === 'r').slice(-12), elog = S.log.filter(e => e.m === 'e').slice(-12);
+  const avgT = nlog.length ? nlog.reduce((a, e) => a + (e.t || 0), 0) / nlog.length : 0;
+  const rmean = rlog.length ? Math.round(rlog.reduce((a, e) => a + (e.mean || 0), 0) / rlog.length) : 0;
+  const rsc = rlog.length ? Math.round(rlog.reduce((a, e) => a + e.sc, 0) / rlog.length) : 0;
+  const efirst = elog.filter(e => e.tries === 0).length;
+  const pos = (u, levels, perLevel) => { const max = levels.length * perLevel; if (u >= max) return 'tous les niveaux réussis'; const l = Math.floor(u / perLevel); return `niveau ${l + 1} « ${levels[l].name} »` + (perLevel === 3 ? `, vitesse ${u % 3 + 1}/3` : ''); };
+  return { week, days, cnt, weak, nlog, rlog, elog, avgT, rmean, rsc, efirst, pos };
+}
+function svLine(e) {
+  const d = new Date(e.d), when = d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const mode = { touch: 'toucher', voice: 'voix', play: 'trompette', tap: 'taper' }[e.mode] || '';
+  if (e.m === 'n') return `${when} · Notes niv. ${e.l + 1} ${SPEEDS[e.s].icon} (${mode}) : ${e.sc}/20, ${String(e.t).replace('.', ',')} s/note${e.miss && e.miss.length ? ' — ratées : ' + e.miss.join(', ') : ''}`;
+  if (e.m === 'r') return `${when} · Rythme niv. ${e.l + 1} « ${RHY_LEVELS[e.l].name} » à ${RHY_LEVELS[e.l].tempi[e.s]} (${mode}) : ${e.sc} %${Math.abs(e.mean) > 45 ? (e.mean > 0 ? ', en retard' : ', en avance') : ''}`;
+  return `${when} · Écoute niv. ${e.l + 1} (${mode}) : ${e.tries === 0 ? 'trouvé du premier coup' : 'trouvé après ' + e.tries + ' erreur' + (e.tries > 1 ? 's' : '')}`;
+}
+function svReport() {
+  const D = svData(), L = [];
+  L.push('BILAN SOLFÈGE TROMPETTE — ' + new Date().toLocaleDateString('fr-FR'));
+  L.push(`7 derniers jours : ${D.week.length} exercice${D.week.length > 1 ? 's' : ''} sur ${D.days} jour${D.days > 1 ? 's' : ''} (notes ${D.cnt('n')}, rythme ${D.cnt('r')}, écoute ${D.cnt('e')}).`);
+  L.push('');
+  L.push('LECTURE DE NOTES : ' + D.pos(S.notes.unlocked, NOTE_LEVELS, 3) + '.');
+  if (D.nlog.length) L.push(`Temps moyen par note (8 dernières séries) : ${D.avgT.toFixed(1).replace('.', ',')} s.`);
+  if (D.weak.length) L.push('Notes fragiles : ' + D.weak.map(w => `${w.note.name} (${placeName(w.note)}, ${Math.round(w.rate * 100)} % d'erreurs)`).join(' ; ') + '.');
+  L.push('');
+  L.push('RYTHME : ' + D.pos(S.rhythm.unlocked, RHY_LEVELS, 3) + '.');
+  if (D.rlog.length) L.push(`Score moyen (12 derniers) : ${D.rsc} %. Placement moyen : ${Math.abs(D.rmean) <= 30 ? 'bien en place' : D.rmean > 0 ? 'plutôt en retard (' + D.rmean + ' ms)' : 'plutôt en avance (' + (-D.rmean) + ' ms)'}.`);
+  L.push('');
+  L.push('ÉCOUTE ET REJOUE : ' + D.pos(S.ear.unlocked, EAR_LEVELS, 1) + '.');
+  if (D.elog.length) L.push(`${D.efirst} mélodie${D.efirst > 1 ? 's' : ''} sur les ${D.elog.length} dernières trouvée${D.efirst > 1 ? 's' : ''} du premier coup.`);
+  L.push('');
+  L.push('DERNIERS EXERCICES');
+  S.log.slice(-15).reverse().forEach(e => L.push('- ' + svLine(e)));
+  return L.join('\n');
+}
+function renderSuivi() {
+  const D = svData(), box = $('svBody');
+  if (!S.log.length) { box.innerHTML = `<div class="card"><h3>Pas encore d'exercice</h3><p class="muted">Le bilan se remplira au fur et à mesure du travail.</p></div>`; return; }
+  const chips = D.weak.map(w => `<div class="chip">${staffSVG({ S: 6, W: 84, H: 56, yTop: 11, clefX: 4, notes: [{ pos: w.note.pos, acc: w.note.acc, x: 48 }] })}<b>${w.note.name}</b><span>${Math.round(w.rate * 100)} % d'erreurs</span></div>`).join('');
+  box.innerHTML = `
+    <div class="card"><h3>Cette semaine</h3>
+      <p><b>${D.week.length}</b> exercice${D.week.length > 1 ? 's' : ''} sur <b>${D.days}</b> jour${D.days > 1 ? 's' : ''}</p>
+      <p class="small muted">Notes : ${D.cnt('n')} · Rythme : ${D.cnt('r')} · Écoute : ${D.cnt('e')}</p></div>
+    <div class="card"><h3>Lecture de notes</h3><p>En cours : ${D.pos(S.notes.unlocked, NOTE_LEVELS, 3)}</p>
+      ${D.nlog.length ? `<p class="small muted">Temps moyen par note : ${D.avgT.toFixed(1).replace('.', ',')} s</p>` : ''}
+      ${D.weak.length ? `<div class="lbl">Notes fragiles</div><div class="chips" style="justify-content:flex-start">${chips}</div>` : '<p class="small muted">Aucune note fragile repérée pour l\'instant.</p>'}</div>
+    <div class="card"><h3>Rythme</h3><p>En cours : ${D.pos(S.rhythm.unlocked, RHY_LEVELS, 3)}</p>
+      ${D.rlog.length ? `<p class="small muted">Score moyen : ${D.rsc} % · ${Math.abs(D.rmean) <= 30 ? 'bien en place' : D.rmean > 0 ? 'plutôt en retard' : 'plutôt en avance'}</p>` : ''}</div>
+    <div class="card"><h3>Écoute et rejoue</h3><p>En cours : ${D.pos(S.ear.unlocked, EAR_LEVELS, 1)}</p>
+      ${D.elog.length ? `<p class="small muted">${D.efirst} sur les ${D.elog.length} dernières trouvées du premier coup</p>` : ''}</div>
+    <div class="card"><h3>Derniers exercices</h3><div class="small">${S.log.slice(-12).reverse().map(e => `<div style="padding:5px 0;border-bottom:1px solid var(--line)">${svLine(e)}</div>`).join('')}</div></div>
+    <button class="btn primary wide" id="svSend">📤 Envoyer le bilan au professeur</button>
+    <p class="help" id="svMsg"></p>
+    <textarea id="svText" class="hidden" readonly style="width:100%;height:180px;margin-top:8px;border-radius:12px;border:1px solid var(--line2);padding:10px;font:13px/1.4 ui-monospace,monospace"></textarea>`;
+  $('svSend').onclick = async () => {
+    const text = svReport(), msg = $('svMsg');
+    try { if (navigator.share) { await navigator.share({ title: 'Bilan Solfège Trompette', text }); msg.textContent = ''; return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(text); msg.textContent = 'Bilan copié : colle-le dans un message (SMS, mail, WhatsApp…).'; return; } catch (e) {}
+    const ta = $('svText'); ta.value = text; ta.classList.remove('hidden'); ta.focus(); ta.select();
+    msg.textContent = 'Sélectionne le texte ci-dessous, copie-le et envoie-le.';
+  };
+}
+
+/* =========================================================
    Réglages
    ========================================================= */
 function renderSettings() {
@@ -1350,7 +1734,7 @@ function renderSettings() {
     const b = $('btnReset');
     if (!b.dataset.arm) { b.dataset.arm = '1'; b.textContent = 'Confirmer : tout effacer ?'; setTimeout(() => { delete b.dataset.arm; b.textContent = 'Effacer la progression'; }, 4000); return; }
     delete b.dataset.arm;
-    S.notes = clone(DEFAULT_STATE.notes); S.rhythm = clone(DEFAULT_STATE.rhythm); save();
+    S.notes = clone(DEFAULT_STATE.notes); S.rhythm = clone(DEFAULT_STATE.rhythm); S.ear = clone(DEFAULT_STATE.ear); S.log = []; save();
     b.textContent = 'Effacer la progression'; $('resetMsg').textContent = 'Progression effacée.';
   };
 }
